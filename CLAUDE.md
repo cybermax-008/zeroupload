@@ -15,7 +15,7 @@ No test framework is configured. No linter is configured.
 
 ## Architecture
 
-VaultKit is a privacy-first file processing PWA (React 18 + Vite) that runs entirely client-side. No server-side processing — all file operations happen in-browser. Deploys as a static site or to iOS/Android via Capacitor.
+ZeroUpload is a privacy-first file processing PWA (React 18 + Vite) that runs entirely client-side. No server-side processing — all file operations happen in-browser. Deploys as a static site or to iOS/Android via Capacitor.
 
 ### Dual Image Engine (the core architectural pattern)
 

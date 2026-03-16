@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.vaultkit.app',
-  appName: 'VaultKit',
+  appId: 'com.zeroupload.app',
+  appName: 'ZeroUpload',
   webDir: 'dist',
   
   server: {
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
   // iOS-specific configuration
   ios: {
     contentInset: 'automatic',
-    scheme: 'VaultKit',
+    scheme: 'ZeroUpload',
     // Enable SharedArrayBuffer (required for wasm-vips)
     // Add to Info.plist: set COOP/COEP headers via WKWebView config
   },

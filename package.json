@@ -1,14 +1,14 @@
 {
-  "name": "vaultkit",
+  "name": "zeroupload",
   "version": "1.0.0",
   "private": true,
-  "description": "Privacy-first file toolkit — resize, convert, merge. Everything runs on your device.",
+  "description": "ZeroUpload — Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "cap:init": "cap init VaultKit com.vaultkit.app --web-dir dist",
+    "cap:init": "cap init ZeroUpload com.zeroupload.app --web-dir dist",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
     "cap:sync": "npm run build && cap sync",

@@ -1,6 +1,6 @@
-# VaultKit — Private File Toolkit
+# ZeroUpload — Private PDF & Image Tools
 
-> Resize, convert, merge. 100% offline, 100% private.
+> Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device.
 
 A privacy-first file processing tool that runs entirely on the user's device. No uploads, no servers, no tracking. Works offline as a PWA and deploys to iOS/Android via Capacitor.
 
@@ -8,15 +8,15 @@ A privacy-first file processing tool that runs entirely on the user's device. No
 
 ```
 ┌─────────────────────────────────────────┐
-│           VaultKit (React)              │
+│          ZeroUpload (React)             │
 ├───────────────┬─────────────────────────┤
 │  Image Engine │     PDF Engine          │
 │  ┌──────────┐ │  ┌────────────────────┐ │
-│  │ wasm-vips│ │  │     pdf-lib        │ │
+│  │ wasm-vips│ │  │  pdf-lib / pdfjs   │ │
 │  │ (primary)│ │  │  merge / split /   │ │
-│  ├──────────┤ │  │  image-to-pdf      │ │
-│  │  Pica.js │ │  └────────────────────┘ │
-│  │(fallback)│ │                         │
+│  ├──────────┤ │  │  rotate / compress │ │
+│  │  Pica.js │ │  │  watermark / img↔  │ │
+│  │(fallback)│ │  └────────────────────┘ │
 │  └──────────┘ │                         │
 ├───────────────┴─────────────────────────┤
 │  Platform Layer                         │
@@ -34,7 +34,7 @@ The app auto-detects the best available engine:
 | **wasm-vips** | Maximum (libvips) | `SharedArrayBuffer` + CORS headers | ~4MB WASM |
 | **Pica.js** | High (Lanczos3) | None | ~45KB |
 
-- **wasm-vips** uses the same library as Sharp (the #1 Node.js image processor). It supports Lanczos3 + smart sharpening, AVIF/TIFF/HEIC, and streaming pipelines.
+- **wasm-vips** uses the same library as Sharp (the #1 Node.js image processor). It supports Lanczos3 + smart sharpening, AVIF/TIFF, and streaming pipelines.
 - **Pica.js** auto-selects WebAssembly → WebWorkers → pure JS. Same Lanczos3 algorithm, slightly less control over sharpening.
 
 The engine falls back gracefully — if `SharedArrayBuffer` isn't available (no CORS headers), Pica kicks in automatically.
@@ -121,44 +121,32 @@ npm run cap:open:ios      # Opens Xcode
 npm run cap:open:android  # Opens Android Studio
 ```
 
-#### iOS: Enable SharedArrayBuffer
-
-In `ios/App/App/Info.plist`, the WKWebView needs to be configured. Capacitor 6+ on iOS 15.4+ supports `SharedArrayBuffer` by default in the WebView.
-
-If you're on an older version, you may need to add a custom `WKWebViewConfiguration`:
-
-```swift
-// ios/App/App/AppDelegate.swift — if needed
-webView.configuration.preferences.setValue(true, forKey: "crossOriginIsolated")
-```
-
-#### Android: Enable SharedArrayBuffer
-
-Android WebView supports `SharedArrayBuffer` on Chrome 91+ (Android 10+). Capacitor's default `androidScheme: 'https'` in `capacitor.config.ts` enables it.
-
-For older devices, the app falls back to Pica.js automatically.
-
 ---
 
 ## Project Structure
 
 ```
-vaultkit/
+zeroupload/
 ├── index.html                    # Entry point
 ├── vite.config.js                # Vite + PWA + CORS config
 ├── capacitor.config.ts           # Capacitor native config
 ├── package.json
 ├── src/
 │   ├── main.jsx                  # React mount
-│   ├── App.jsx                   # Shell (header, tabs, footer)
+│   ├── App.jsx                   # Shell (home grid, tool views)
 │   ├── components/
 │   │   ├── ui.jsx                # Shared components (DropZone, Btn, etc.)
-│   │   ├── ResizeTab.jsx         # Image resize & format convert
+│   │   ├── ResizeTab.jsx         # Image resize
+│   │   ├── CompressTab.jsx       # Image compress
+│   │   ├── ConvertTab.jsx        # Image format convert
+│   │   ├── CropTab.jsx           # Image crop
 │   │   ├── ImgToPdfTab.jsx       # Images → PDF
-│   │   └── PdfToolsTab.jsx       # PDF merge & split
+│   │   ├── PdfToImageTab.jsx     # PDF → Images
+│   │   └── PdfToolsTab.jsx       # PDF merge, split, rotate, compress, watermark, page #s
 │   └── lib/
 │       ├── imageEngine.js        # Dual engine (wasm-vips / Pica)
 │       ├── pdfEngine.js          # pdf-lib wrapper
+│       ├── pdfRenderEngine.js    # pdfjs-dist wrapper (PDF → Image)
 │       ├── fileUtils.js          # File I/O, Capacitor bridge
 │       └── theme.js              # Design tokens
 └── public/
@@ -175,7 +163,8 @@ vaultkit/
    - Pica: `pica.resize()` with quality=3 (Lanczos3, window=3) + unsharp mask
 3. **Format convert** → wasm-vips: `writeToBuffer('.webp')` / Pica: Canvas `toBlob()`
 4. **PDF operations** → pdf-lib runs entirely in JS, no native dependencies
-5. **Save** → Browser: `URL.createObjectURL()` + `<a download>` / Capacitor: `Filesystem.writeFile()` + native Share sheet
+5. **PDF → Image** → pdfjs-dist renders pages to canvas, exports as JPEG/PNG
+6. **Save** → Browser: `URL.createObjectURL()` + `<a download>` / Capacitor: `Filesystem.writeFile()` + native Share sheet
 
 ## PWA / Offline
 
