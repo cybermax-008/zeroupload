@@ -112,13 +112,9 @@ export const FORMAT_MAP = {
 // ── Size presets ──
 export const SIZE_PRESETS = [
   { label: 'Custom',      w: 0,    h: 0 },
-  { label: 'HD',           w: 1280, h: 720 },
-  { label: 'Full HD',      w: 1920, h: 1080 },
-  { label: '4K',           w: 3840, h: 2160 },
   { label: 'Instagram',    w: 1080, h: 1080 },
   { label: 'Twitter/X',    w: 1200, h: 675 },
   { label: 'LinkedIn',     w: 1200, h: 627 },
   { label: 'Passport',     w: 600,  h: 600 },
-  { label: 'A4 @300dpi',   w: 2480, h: 3508 },
   { label: 'A4 @150dpi',   w: 1240, h: 1754 },
 ];
