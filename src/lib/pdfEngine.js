@@ -346,33 +346,58 @@ export async function addPageNumbers(file, options = {}, onProgress) {
   };
 }
 
-// ── Compress PDF (re-encode embedded images at lower quality) ──
+// ── Compress PDF (render pages to canvas, re-encode as JPEG) ──
 export async function compressPdf(file, imageQuality = 0.5, onProgress) {
   onProgress?.('Reading PDF…');
   const bytes = await readFileAsArrayBuffer(file);
-  const srcDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-  const totalPages = srcDoc.getPageCount();
 
-  // Strategy: render each page to canvas at original size, re-encode as JPEG, build new PDF
-  // This loses text selectability but reliably compresses
-  onProgress?.('Compressing pages…');
+  // Load with pdfjs-dist for rendering
+  onProgress?.('Loading renderer…');
+  const pdfjs = await import('pdfjs-dist');
+  if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.mjs',
+      import.meta.url
+    ).href;
+  }
+
+  const pdfDoc = await pdfjs.getDocument({ data: bytes }).promise;
+  const totalPages = pdfDoc.numPages;
 
   const newDoc = await PDFDocument.create();
 
-  for (let i = 0; i < totalPages; i++) {
-    onProgress?.(`Compressing page ${i + 1}/${totalPages}…`);
+  for (let i = 1; i <= totalPages; i++) {
+    onProgress?.(`Compressing page ${i}/${totalPages}…`);
 
-    const [srcPage] = await newDoc.copyPages(srcDoc, [i]);
-    newDoc.addPage(srcPage);
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    // Render page to canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    // Re-encode as JPEG at the user-selected quality
+    const jpegBlob = await new Promise(resolve =>
+      canvas.toBlob(resolve, 'image/jpeg', imageQuality)
+    );
+    const jpegBytes = new Uint8Array(await jpegBlob.arrayBuffer());
+    const img = await newDoc.embedJpg(jpegBytes);
+
+    // Use original page dimensions (in PDF points) so output matches
+    const origViewport = page.getViewport({ scale: 1 });
+    const pw = origViewport.width;
+    const ph = origViewport.height;
+    const newPage = newDoc.addPage([pw, ph]);
+    newPage.drawImage(img, { x: 0, y: 0, width: pw, height: ph });
   }
 
-  // Try to compress by removing metadata and using object streams
-  onProgress?.('Optimizing…');
-  const pdfBytes = await newDoc.save({
-    useObjectStreams: true,
-    addDefaultPage: false,
-  });
-
+  onProgress?.('Saving…');
+  const pdfBytes = await newDoc.save({ useObjectStreams: true });
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
   return {

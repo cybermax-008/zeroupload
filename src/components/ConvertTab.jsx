@@ -114,6 +114,21 @@ export default function ConvertTab() {
                 <Toggle options={FORMATS} value={format} onChange={setFormat} />
               </div>
 
+              {/* Same format warning */}
+              {inputFormat === format && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '8px 12px', borderRadius: 8,
+                  background: theme.accentDim,
+                  border: `1px solid rgba(201,165,90,0.2)`,
+                }}>
+                  <span style={{ fontSize: 14 }}>!</span>
+                  <span style={{ fontSize: 12, color: theme.accent }}>
+                    Source image is already {FORMAT_MAP[format]?.label || 'this format'}. Choose a different output format.
+                  </span>
+                </div>
+              )}
+
               {/* Quality (lossy only) */}
               {format !== 'image/png' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

@@ -7,14 +7,50 @@ import { humanSize } from '../lib/fileUtils';
 // ══════════════════════════════════════════
 export function DropZone({ accept, multiple, onFiles, label, sublabel, compact }) {
   const [drag, setDrag] = useState(false);
+  const [rejectMsg, setRejectMsg] = useState('');
   const inputRef = useRef();
+  const rejectTimer = useRef(null);
+
+  const matchesAccept = (file) => {
+    if (!accept) return true;
+    const parts = accept.split(',').map(s => s.trim().toLowerCase());
+    const fType = file.type.toLowerCase();
+    const fName = file.name.toLowerCase();
+    return parts.some(p => {
+      if (p.endsWith('/*')) return fType.startsWith(p.slice(0, -1));
+      if (p.startsWith('.')) return fName.endsWith(p);
+      return fType === p;
+    });
+  };
+
+  const showReject = (msg) => {
+    setRejectMsg(msg);
+    if (rejectTimer.current) clearTimeout(rejectTimer.current);
+    rejectTimer.current = setTimeout(() => setRejectMsg(''), 3000);
+  };
 
   const handle = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDrag(false);
     const files = Array.from(e.dataTransfer?.files || e.target?.files || []);
-    if (files.length) onFiles(files);
+    if (!files.length) return;
+
+    const valid = files.filter(f => matchesAccept(f));
+    if (valid.length === 0) {
+      const expectsPdf = accept?.includes('.pdf') || accept?.includes('application/pdf');
+      const expectsImage = accept?.includes('image/');
+      if (expectsPdf && files[0]?.type.startsWith('image/')) {
+        showReject('This tool requires a PDF file, not an image.');
+      } else if (expectsImage && files[0]?.type === 'application/pdf') {
+        showReject('This tool requires an image file, not a PDF.');
+      } else {
+        showReject('Unsupported file format.');
+      }
+      return;
+    }
+    setRejectMsg('');
+    onFiles(valid);
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -25,7 +61,7 @@ export function DropZone({ accept, multiple, onFiles, label, sublabel, compact }
       onDrop={handle}
       onClick={() => inputRef.current?.click()}
       style={{
-        border: `1.5px dashed ${drag ? theme.accent : theme.border}`,
+        border: `1.5px dashed ${drag ? theme.accent : rejectMsg ? theme.error : theme.border}`,
         borderRadius: theme.radius,
         padding: compact ? '20px 16px' : '40px 24px',
         textAlign: 'center',
@@ -54,6 +90,14 @@ export function DropZone({ accept, multiple, onFiles, label, sublabel, compact }
       <p style={{ color: theme.textDim, fontSize: 11, marginTop: 6 }}>
         {sublabel || 'Files never leave your device'}
       </p>
+      {rejectMsg && (
+        <p style={{
+          color: theme.error, fontSize: 12, fontWeight: 500,
+          marginTop: 10, animation: 'fadeUp .2s ease',
+        }}>
+          {rejectMsg}
+        </p>
+      )}
     </div>
   );
 }

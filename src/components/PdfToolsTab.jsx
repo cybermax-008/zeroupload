@@ -351,7 +351,7 @@ export default function PdfToolsTab({ defaultMode }) {
                 </span>
               </div>
               <p style={{ fontSize: 11, color: theme.textDim, lineHeight: 1.5 }}>
-                Optimizes PDF structure. Results vary by content.
+                Re-encodes pages as compressed images. Lower quality = smaller file. Text will not be selectable in the output.
               </p>
               {compressReduction !== null && (
                 <div style={{

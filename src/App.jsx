@@ -10,7 +10,6 @@ import PdfToImageTab from './components/PdfToImageTab';
 import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
-import OcrTab from './components/OcrTab';
 import { EngineIndicator } from './components/ui';
 
 const TOOLS = [
@@ -32,7 +31,6 @@ const TOOLS = [
       { id: 'pdfcompress', icon: '▼', label: 'Compress PDF', desc: 'Reduce PDF file size' },
       { id: 'pdftools', icon: '⊞', label: 'PDF Toolkit',     desc: 'Merge, split, rotate, watermark, page numbers' },
       { id: 'pdforganize', icon: '⊞', label: 'Organize Pages', desc: 'Reorder, delete, and insert PDF pages' },
-      { id: 'ocr',         icon: '⊙', label: 'OCR',           desc: 'Extract text from scanned PDFs and images' },
     ],
   },
 ];
@@ -239,7 +237,6 @@ export default function App() {
               {activeTool === 'pdftools' && <PdfToolsTab />}
               {activeTool === 'metadata' && <MetadataStripTab />}
               {activeTool === 'pdforganize' && <PdfPageOrganizerTab />}
-              {activeTool === 'ocr' && <OcrTab />}
             </main>
           </>
         )}
