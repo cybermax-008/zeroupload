@@ -36,7 +36,6 @@
     "cap:open:android": "cap open android"
   },
   "dependencies": {
-    "jspdf": "^4.2.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.5.207",
     "pica": "^9.0.1",

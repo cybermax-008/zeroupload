@@ -9,10 +9,7 @@ import ImgToPdfTab from './components/ImgToPdfTab';
 import PdfToImageTab from './components/PdfToImageTab';
 import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
-import PdfProtectTab from './components/PdfProtectTab';
-import PdfUnlockTab from './components/PdfUnlockTab';
 import PdfFillSignTab from './components/PdfFillSignTab';
-import PdfEditTab from './components/PdfEditTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
 import OcrTab from './components/OcrTab';
 import { EngineIndicator } from './components/ui';
@@ -36,10 +33,7 @@ const TOOLS = [
       { id: 'pdfcompress', icon: '▼', label: 'Compress PDF', desc: 'Reduce PDF file size' },
       { id: 'pdftools', icon: '⊞', label: 'PDF Toolkit',     desc: 'Merge, split, rotate, watermark, page numbers' },
       { id: 'pdffillsign', icon: '✎', label: 'Fill & Sign',   desc: 'Fill form fields and add signatures to PDFs' },
-      { id: 'pdfedit',     icon: '✐', label: 'Edit PDF',      desc: 'Add text, images, and shapes to PDF pages' },
       { id: 'pdforganize', icon: '⊞', label: 'Organize Pages', desc: 'Reorder, delete, and insert PDF pages' },
-      { id: 'pdfprotect',  icon: '⊕', label: 'Protect PDF',   desc: 'Add password encryption to PDFs' },
-      { id: 'pdfunlock',   icon: '⊖', label: 'Unlock PDF',    desc: 'Remove password protection from PDFs' },
       { id: 'ocr',         icon: '⊙', label: 'OCR',           desc: 'Extract text from scanned PDFs and images' },
     ],
   },
@@ -247,10 +241,7 @@ export default function App() {
               {activeTool === 'pdftools' && <PdfToolsTab />}
               {activeTool === 'metadata' && <MetadataStripTab />}
               {activeTool === 'pdffillsign' && <PdfFillSignTab />}
-              {activeTool === 'pdfedit' && <PdfEditTab />}
               {activeTool === 'pdforganize' && <PdfPageOrganizerTab />}
-              {activeTool === 'pdfprotect' && <PdfProtectTab />}
-              {activeTool === 'pdfunlock' && <PdfUnlockTab />}
               {activeTool === 'ocr' && <OcrTab />}
             </main>
           </>
