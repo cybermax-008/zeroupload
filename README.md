@@ -1,74 +1,80 @@
-# ZeroUpload — Private PDF & Image Tools
+# ZeroUpload
 
-> Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device.
+**Private PDF & image tools that run entirely on your device.**
 
-A privacy-first file processing tool that runs entirely on the user's device. No uploads, no servers, no tracking. Works offline as a PWA and deploys to iOS/Android via Capacitor.
+No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
 
-## Architecture
+## Why ZeroUpload?
 
-```
-┌─────────────────────────────────────────┐
-│          ZeroUpload (React)             │
-├───────────────┬─────────────────────────┤
-│  Image Engine │     PDF Engine          │
-│  ┌──────────┐ │  ┌────────────────────┐ │
-│  │ wasm-vips│ │  │  pdf-lib / pdfjs   │ │
-│  │ (primary)│ │  │  merge / split /   │ │
-│  ├──────────┤ │  │  rotate / compress │ │
-│  │  Pica.js │ │  │  watermark / img↔  │ │
-│  │(fallback)│ │  └────────────────────┘ │
-│  └──────────┘ │                         │
-├───────────────┴─────────────────────────┤
-│  Platform Layer                         │
-│  Browser (PWA) │ iOS │ Android          │
-│  Service Worker│ Capacitor WebView      │
-└─────────────────────────────────────────┘
-```
+Most online file tools upload your documents to remote servers for processing. ZeroUpload takes a different approach: **everything runs locally** using WebAssembly and browser APIs. This means:
 
-### Dual Image Engine
+- Your files stay on your device — always
+- Works offline after first load (PWA)
+- No accounts, no sign-ups, no cookies
+- You can verify the code yourself — it's all here
 
-The app auto-detects the best available engine:
+## Tools
 
-| Engine | Quality | Requirements | Size |
-|--------|---------|-------------|------|
-| **wasm-vips** | Maximum (libvips) | `SharedArrayBuffer` + CORS headers | ~4MB WASM |
-| **Pica.js** | High (Lanczos3) | None | ~45KB |
+**Image Tools**
+- **Resize** — Scale images to exact dimensions or presets
+- **Compress** — Reduce file size with quality control
+- **Convert** — PNG, JPG, WebP, AVIF, and more
+- **Crop** — Select and export a region
 
-- **wasm-vips** uses the same library as Sharp (the #1 Node.js image processor). It supports Lanczos3 + smart sharpening, AVIF/TIFF, and streaming pipelines.
-- **Pica.js** auto-selects WebAssembly → WebWorkers → pure JS. Same Lanczos3 algorithm, slightly less control over sharpening.
+**PDF Tools**
+- **Merge** — Combine multiple PDFs into one
+- **Split** — Extract specific pages
+- **Compress** — Reduce PDF file size
+- **Rotate** — Fix page orientation
+- **Watermark** — Add text watermarks
+- **Page Numbers** — Add page numbering
+- **Image to PDF** — Combine images into a PDF
+- **PDF to Image** — Convert pages to JPEG or PNG
 
-The engine falls back gracefully — if `SharedArrayBuffer` isn't available (no CORS headers), Pica kicks in automatically.
-
----
-
-## Quick Start
+## Run Locally
 
 ```bash
-# Install dependencies
+git clone https://github.com/cybermax-008/zeroupload.git
+cd zeroupload
 npm install
-
-# Start dev server (CORS headers auto-configured in vite.config.js)
 npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
 
-## Deployment
+Open [http://localhost:5173](http://localhost:5173) — that's it. All tools work immediately.
 
-### Web (Static Hosting)
+### Build for Production
 
-Build and deploy the `dist/` folder. **Critical:** your server must send these headers for wasm-vips to work:
-
-```
-Cross-Origin-Embedder-Policy: require-corp
-Cross-Origin-Opener-Policy: same-origin
+```bash
+npm run build     # Output → dist/
+npm run preview   # Preview the build locally
 ```
 
-#### Vercel (`vercel.json`)
+Deploy the `dist/` folder to any static host (Vercel, Netlify, Cloudflare Pages, your own server, etc.).
+
+## Image Processing Engine
+
+ZeroUpload uses a dual-engine system that auto-selects the best available option:
+
+| Engine | Powered by | When it activates |
+|--------|-----------|-------------------|
+| **wasm-vips** | libvips (same as Sharp) | When `SharedArrayBuffer` is available |
+| **Pica.js** | Lanczos3 resampling | Automatic fallback otherwise |
+
+Both engines produce high-quality results. wasm-vips gives you professional-grade processing (AVIF/TIFF support, smart sharpening); Pica.js works everywhere with zero setup.
+
+> **Note:** For wasm-vips to activate, your server must send `Cross-Origin-Embedder-Policy: require-corp` and `Cross-Origin-Opener-Policy: same-origin` headers. The dev server includes these automatically. Without them, Pica.js kicks in — still great quality, just fewer format options.
+
+## Self-Hosting
+
+If you're deploying to your own server, add these headers for the best experience:
+
+**Nginx**
+```nginx
+add_header Cross-Origin-Embedder-Policy "require-corp" always;
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+```
+
+**Vercel** (`vercel.json`)
 ```json
 {
   "headers": [
@@ -83,107 +89,26 @@ Cross-Origin-Opener-Policy: same-origin
 }
 ```
 
-#### Netlify (`_headers`)
+**Netlify / Cloudflare Pages** (`_headers`)
 ```
 /*
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
 ```
 
-#### Cloudflare Pages (`_headers`)
-```
-/*
-  Cross-Origin-Embedder-Policy: require-corp
-  Cross-Origin-Opener-Policy: same-origin
-```
+## Tech Stack
 
-#### Nginx
-```nginx
-add_header Cross-Origin-Embedder-Policy "require-corp" always;
-add_header Cross-Origin-Opener-Policy "same-origin" always;
-```
+- **React 18** + **Vite** — Fast dev experience, optimized builds
+- **wasm-vips** — WebAssembly port of libvips for image processing
+- **Pica.js** — Lightweight image resize fallback
+- **pdf-lib** — PDF manipulation in pure JavaScript
+- **pdfjs-dist** — PDF rendering to canvas
+- **vite-plugin-pwa** — Offline support via Workbox service worker
+- **Capacitor** — Optional iOS/Android packaging
 
-> **Without these headers:** The app still works — it falls back to Pica.js (Lanczos3), which is still excellent quality. wasm-vips just adds the extra edge for professional-grade processing.
+## Contributing
 
-### iOS & Android (Capacitor)
-
-```bash
-# Initialize Capacitor (one-time)
-npm run cap:init
-
-# Add platforms
-npm run cap:add:ios
-npm run cap:add:android
-
-# Build web → sync to native → open IDE
-npm run cap:sync
-npm run cap:open:ios      # Opens Xcode
-npm run cap:open:android  # Opens Android Studio
-```
-
----
-
-## Project Structure
-
-```
-zeroupload/
-├── index.html                    # Entry point
-├── vite.config.js                # Vite + PWA + CORS config
-├── capacitor.config.ts           # Capacitor native config
-├── package.json
-├── src/
-│   ├── main.jsx                  # React mount
-│   ├── App.jsx                   # Shell (home grid, tool views)
-│   ├── components/
-│   │   ├── ui.jsx                # Shared components (DropZone, Btn, etc.)
-│   │   ├── ResizeTab.jsx         # Image resize
-│   │   ├── CompressTab.jsx       # Image compress
-│   │   ├── ConvertTab.jsx        # Image format convert
-│   │   ├── CropTab.jsx           # Image crop
-│   │   ├── ImgToPdfTab.jsx       # Images → PDF
-│   │   ├── PdfToImageTab.jsx     # PDF → Images
-│   │   └── PdfToolsTab.jsx       # PDF merge, split, rotate, compress, watermark, page #s
-│   └── lib/
-│       ├── imageEngine.js        # Dual engine (wasm-vips / Pica)
-│       ├── pdfEngine.js          # pdf-lib wrapper
-│       ├── pdfRenderEngine.js    # pdfjs-dist wrapper (PDF → Image)
-│       ├── fileUtils.js          # File I/O, Capacitor bridge
-│       └── theme.js              # Design tokens
-└── public/
-    ├── favicon.svg
-    ├── pwa-192x192.png
-    └── pwa-512x512.png
-```
-
-## How it works
-
-1. **User drops a file** → `FileReader` reads it into an `ArrayBuffer` (never leaves the browser)
-2. **Image resize** → Engine auto-selects wasm-vips (if available) or Pica.js
-   - wasm-vips: `Image.thumbnailBuffer()` for downscale (shrink-on-load + Lanczos3 + sharpen)
-   - Pica: `pica.resize()` with quality=3 (Lanczos3, window=3) + unsharp mask
-3. **Format convert** → wasm-vips: `writeToBuffer('.webp')` / Pica: Canvas `toBlob()`
-4. **PDF operations** → pdf-lib runs entirely in JS, no native dependencies
-5. **PDF → Image** → pdfjs-dist renders pages to canvas, exports as JPEG/PNG
-6. **Save** → Browser: `URL.createObjectURL()` + `<a download>` / Capacitor: `Filesystem.writeFile()` + native Share sheet
-
-## PWA / Offline
-
-The app uses `vite-plugin-pwa` with Workbox to:
-- Pre-cache all JS/CSS/HTML/WASM on first visit
-- Cache Google Fonts with CacheFirst strategy
-- Cache WASM binaries (up to 10MB) for 30 days
-- Auto-update service worker in background
-
-After first load, the app works completely offline — airplane mode, no network, etc.
-
-## Privacy Guarantees
-
-- **Zero network requests** after initial load (all processing is local)
-- **No analytics, no tracking, no cookies**
-- **No server-side processing** — files are never uploaded
-- **No localStorage** of user files — everything is in-memory only
-- **PWA** — installable, works offline, feels native
-- **Open source** — users can verify the code
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## License
 
