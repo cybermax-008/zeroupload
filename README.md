@@ -1,5 +1,8 @@
 # ZeroUpload
 
+[![Build](https://github.com/cybermax-008/zeroupload/actions/workflows/build.yml/badge.svg)](https://github.com/cybermax-008/zeroupload/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 **Private PDF & image tools that run entirely on your device.**
 
 No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
@@ -32,6 +35,8 @@ Most online file tools upload your documents to remote servers for processing. Z
 - **PDF to Image** — Convert pages to JPEG or PNG
 
 ## Run Locally
+
+Requires **Node.js 20+** (see `.nvmrc`).
 
 ```bash
 git clone https://github.com/cybermax-008/zeroupload.git
@@ -108,8 +113,10 @@ add_header Cross-Origin-Opener-Policy "same-origin" always;
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct.
 
 ## License
 
-MIT
+[MIT](LICENSE)
