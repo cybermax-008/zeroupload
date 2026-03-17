@@ -5,7 +5,7 @@
 
 **Private PDF & image tools that run entirely on your device.**
 
-No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
+**[Try it live](https://zeroupload-gold.vercel.app)** — No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
 
 ## Why ZeroUpload?
 
