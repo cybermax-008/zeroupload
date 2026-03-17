@@ -1,9 +1,29 @@
 {
   "name": "zeroupload",
   "version": "1.0.0",
-  "private": true,
   "description": "ZeroUpload — Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline.",
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cybermax-008/zeroupload.git"
+  },
+  "homepage": "https://github.com/cybermax-008/zeroupload",
+  "bugs": {
+    "url": "https://github.com/cybermax-008/zeroupload/issues"
+  },
+  "keywords": [
+    "pdf",
+    "image",
+    "compress",
+    "resize",
+    "convert",
+    "crop",
+    "privacy",
+    "offline",
+    "pwa",
+    "wasm"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
