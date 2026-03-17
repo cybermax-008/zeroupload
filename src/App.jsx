@@ -11,7 +11,6 @@ import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
 import OcrTab from './components/OcrTab';
-import FillSignTab from './components/FillSignTab';
 import { EngineIndicator } from './components/ui';
 
 const TOOLS = [
@@ -34,7 +33,6 @@ const TOOLS = [
       { id: 'pdftools', icon: '⊞', label: 'PDF Toolkit',     desc: 'Merge, split, rotate, watermark, page numbers' },
       { id: 'pdforganize', icon: '⊞', label: 'Organize Pages', desc: 'Reorder, delete, and insert PDF pages' },
       { id: 'ocr',         icon: '⊙', label: 'OCR',           desc: 'Extract text from scanned PDFs and images' },
-      { id: 'fillsign',    icon: '✎', label: 'Fill & Sign',   desc: 'Fill form fields and add signatures to PDFs' },
     ],
   },
 ];
@@ -242,7 +240,6 @@ export default function App() {
               {activeTool === 'metadata' && <MetadataStripTab />}
               {activeTool === 'pdforganize' && <PdfPageOrganizerTab />}
               {activeTool === 'ocr' && <OcrTab />}
-              {activeTool === 'fillsign' && <FillSignTab />}
             </main>
           </>
         )}
