@@ -30,6 +30,14 @@ Engine state is stored as **module-level variables** (not React state) — a sin
 
 `src/lib/pdfEngine.js` wraps pdf-lib for merge, split, and image-to-PDF. All operations return `{ blob, pageCount, download() }`. Unsupported image formats (WebP, AVIF) are converted to PNG via canvas before PDF embedding.
 
+### Additional Engines
+
+- `src/lib/metadataEngine.js` — EXIF/metadata stripping for images (canvas re-encode) and PDFs (pdf-lib field clearing). Includes a lightweight JPEG EXIF parser for display.
+- `src/lib/pdfPageEngine.js` — Page-level PDF operations (reorder, delete, insert, thumbnails) using pdf-lib + pdfjs-dist.
+- `src/lib/ocrEngine.js` — OCR via tesseract.js (lazy-loaded). Supports 12 languages. Wraps worker lifecycle.
+
+**Note:** pdf-lib does NOT support PDF encryption. Do not attempt `save({ userPassword })` — it silently produces an unencrypted file.
+
 ### Styling
 
 All styling is inline React style objects — no CSS files or class names. Design tokens are centralized in `src/lib/theme.js`. Global styles are injected by `theme.js` at import time.
