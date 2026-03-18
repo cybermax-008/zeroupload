@@ -34,9 +34,9 @@ Engine state is stored as **module-level variables** (not React state) — a sin
 
 - `src/lib/metadataEngine.js` — EXIF/metadata stripping for images (canvas re-encode) and PDFs (pdf-lib field clearing). Includes a lightweight JPEG EXIF parser for display.
 - `src/lib/pdfPageEngine.js` — Page-level PDF operations (reorder, delete, insert, thumbnails) using pdf-lib + pdfjs-dist.
-- `src/lib/ocrEngine.js` — OCR via tesseract.js (lazy-loaded). Supports 12 languages. Wraps worker lifecycle.
-
 **Note:** pdf-lib does NOT support PDF encryption. Do not attempt `save({ userPassword })` — it silently produces an unencrypted file.
+
+**PDF Compression** uses pdfjs-dist to render each page to canvas, then re-encodes as JPEG at the user-selected quality. This means compressed PDFs lose text selectability.
 
 ### Styling
 
