@@ -69,6 +69,11 @@ export async function initEngine(preferVips = true) {
   return initPromise;
 }
 
+// ── Get vips instance (for direct access by other engines) ──
+export function getVipsInstance() {
+  return vipsInstance;
+}
+
 // ── Get engine info ──
 export function getEngineInfo() {
   return {

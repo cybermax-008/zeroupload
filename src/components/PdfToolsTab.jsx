@@ -30,9 +30,13 @@ export default function PdfToolsTab({ defaultMode }) {
   const [rotateRange, setRotateRange] = useState('');
 
   // Compress state
-  const [compressQuality, setCompressQuality] = useState(0.5);
+  const [compressQuality, setCompressQuality] = useState(0.82);
   const [inputSize, setInputSize] = useState(0);
   const [outputSize, setOutputSize] = useState(null);
+
+  // Smart compress state
+  const [compressMode, setCompressMode] = useState('smart');
+  const [compressStats, setCompressStats] = useState(null);
 
   // Watermark state
   const [wmText, setWmText] = useState('CONFIDENTIAL');
@@ -91,6 +95,7 @@ export default function PdfToolsTab({ defaultMode }) {
     setSplitRange('');
     setOutputSize(null);
     setInputSize(0);
+    setCompressStats(null);
   };
 
   const doMerge = async () => {
@@ -132,9 +137,14 @@ export default function PdfToolsTab({ defaultMode }) {
 
   const doCompress = async () => {
     if (!files.length) return;
+    setCompressStats(null);
     try {
-      const result = await compressPdf(files[0], compressQuality, setStatus);
+      const result = await compressPdf(files[0], compressQuality, setStatus, {
+        mode: compressMode,
+        targetSSIM: 0.95,
+      });
       setOutputSize(result.blob.size);
+      if (result.stats) setCompressStats(result.stats);
       result.download();
       setStatus(`Compressed ✓ · ${result.pageCount} pages`);
     } catch (e) {
@@ -334,9 +344,22 @@ export default function PdfToolsTab({ defaultMode }) {
           {mode === 'compress' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: theme.textMuted, fontSize: 12, fontWeight: 500 }}>Mode</span>
+                <Toggle
+                  options={[['smart', 'Smart'], ['aggressive', 'Aggressive']]}
+                  value={compressMode}
+                  onChange={(v) => {
+                    setCompressMode(v);
+                    setCompressStats(null);
+                    setOutputSize(null);
+                    setCompressQuality(v === 'smart' ? 0.82 : 0.5);
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{
                   color: theme.textMuted, fontSize: 12, fontWeight: 500, minWidth: 48,
-                }}>Quality</span>
+                }}>{compressMode === 'smart' ? 'Max Quality' : 'Quality'}</span>
                 <input
                   type="range" min="0.1" max="1" step="0.05"
                   value={compressQuality}
@@ -351,7 +374,9 @@ export default function PdfToolsTab({ defaultMode }) {
                 </span>
               </div>
               <p style={{ fontSize: 11, color: theme.textDim, lineHeight: 1.5 }}>
-                Re-encodes pages as compressed images. Lower quality = smaller file. Text will not be selectable in the output.
+                {compressMode === 'smart'
+                  ? 'Recompresses embedded images with MozJPEG. Preserves text, vectors, and PDF structure.'
+                  : 'Re-encodes entire pages as images. Smaller files but text will not be selectable.'}
               </p>
               {compressReduction !== null && (
                 <div style={{
@@ -376,6 +401,26 @@ export default function PdfToolsTab({ defaultMode }) {
                   }}>
                     {compressReduction > 0 ? `−${compressReduction}%` : `+${Math.abs(compressReduction)}%`}
                   </span>
+                </div>
+              )}
+              {compressStats && compressMode === 'smart' && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+                  padding: '8px 14px', borderRadius: 8,
+                  background: theme.surfaceAlt,
+                  border: `1px solid ${theme.border}`,
+                }}>
+                  {[
+                    ['Images', compressStats.totalImages, theme.textMuted],
+                    ['Recompressed', compressStats.imagesRecompressed, theme.success],
+                    ['Downsampled', compressStats.imagesDownsampled, theme.accent],
+                    ['Skipped', compressStats.imagesSkipped, theme.textMuted],
+                  ].map(([label, value, color]) => (
+                    <span key={label} style={{ color: theme.textMuted, fontSize: 11 }}>
+                      {label}{' '}
+                      <span style={{ fontFamily: theme.fontMono, fontWeight: 600, color }}>{value}</span>
+                    </span>
+                  ))}
                 </div>
               )}
             </div>

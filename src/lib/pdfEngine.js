@@ -346,8 +346,17 @@ export async function addPageNumbers(file, options = {}, onProgress) {
   };
 }
 
-// ── Compress PDF (render pages to canvas, re-encode as JPEG) ──
-export async function compressPdf(file, imageQuality = 0.5, onProgress) {
+// ── Compress PDF — smart (recompress images) or aggressive (rasterize pages) ──
+export async function compressPdf(file, imageQuality = 0.5, onProgress, options = {}) {
+  if (options.mode !== 'aggressive') {
+    const { smartCompressPdf } = await import('./pdfSmartCompressEngine');
+    return smartCompressPdf(file, {
+      maxQuality: Math.round(imageQuality * 100),
+      targetSSIM: options.targetSSIM || 0.95,
+    }, onProgress);
+  }
+
+  // Aggressive mode — rasterize entire pages
   onProgress?.('Reading PDF…');
   const bytes = await readFileAsArrayBuffer(file);
 
