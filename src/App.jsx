@@ -49,7 +49,7 @@ export default function App() {
     initEngine(true).then((info) => {
       setEngineInfo(info);
     }).catch((err) => {
-      console.error('[ZeroUpload] Engine init failed:', err);
+      console.error('[AcornTools] Engine init failed:', err);
     });
     return () => { destroyEngine(); };
   }, []);
@@ -108,7 +108,7 @@ export default function App() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                ZeroUpload
+                Acorn Tools
               </h1>
             </div>
           </div>
@@ -251,13 +251,13 @@ export default function App() {
           <span>
             Powered by {engineInfo?.engine === 'vips' ? 'libvips' : 'Lanczos3'} resampling · pdf-lib · pdfjs · Web Workers
           </span>
-          <span>ZeroUpload — No servers. No tracking. No cookies. Just your files.</span>
+          <span>Acorn Tools — No servers. No tracking. No cookies. Just your files.</span>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 16,
             marginTop: 4,
           }}>
             <a
-              href="https://github.com/cybermax-008/zeroupload"
+              href="https://github.com/cybermax-008/Acorn-tools"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -276,7 +276,7 @@ export default function App() {
             </a>
             <span style={{ color: theme.textDim }}>·</span>
             <a
-              href="https://github.com/cybermax-008/zeroupload/issues/new?labels=feedback&title=Feedback:+&body=Tell+us+what+you+think!"
+              href="https://github.com/cybermax-008/Acorn-tools/issues/new?labels=feedback&title=Feedback:+&body=Tell+us+what+you+think!"
               target="_blank"
               rel="noopener noreferrer"
               style={{

@@ -1,12 +1,12 @@
-# Contributing to ZeroUpload
+# Contributing to Acorn Tools
 
 Thanks for your interest in contributing! Here's how to get started.
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/cybermax-008/zeroupload.git
-cd zeroupload
+git clone https://github.com/cybermax-008/Acorn-tools.git
+cd Acorn-tools
 npm install
 npm run dev
 ```

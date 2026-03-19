@@ -1,5 +1,5 @@
 /**
- * ZeroUpload Design System
+ * Acorn Tools Design System
  */
 
 export const theme = {

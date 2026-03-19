@@ -1,5 +1,5 @@
 /**
- * ZeroUpload PDF Page Engine
+ * Acorn Tools PDF Page Engine
  *
  * Page-level operations: reorder, delete, insert, thumbnails.
  * All operations run client-side using pdf-lib + pdfjs-dist.

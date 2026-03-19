@@ -1,15 +1,15 @@
-# ZeroUpload
+# Acorn Tools
 
-[![Build](https://github.com/cybermax-008/zeroupload/actions/workflows/build.yml/badge.svg)](https://github.com/cybermax-008/zeroupload/actions/workflows/build.yml)
+[![Build](https://github.com/cybermax-008/Acorn-tools/actions/workflows/build.yml/badge.svg)](https://github.com/cybermax-008/Acorn-tools/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Private PDF & image tools that run entirely on your device.**
 
-**[Try it live](https://zeroupload-gold.vercel.app)** — No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
+**[Try it live](https://www.acorntools.net)** — No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
 
-## Why ZeroUpload?
+## Why Acorn Tools?
 
-Most online file tools upload your documents to remote servers for processing. ZeroUpload takes a different approach: **everything runs locally** using WebAssembly and browser APIs. This means:
+Most online file tools upload your documents to remote servers for processing. Acorn Tools takes a different approach: **everything runs locally** using WebAssembly and browser APIs. This means:
 
 - Your files stay on your device — always
 - Works offline after first load (PWA)
@@ -39,8 +39,8 @@ Most online file tools upload your documents to remote servers for processing. Z
 Requires **Node.js 20+** (see `.nvmrc`).
 
 ```bash
-git clone https://github.com/cybermax-008/zeroupload.git
-cd zeroupload
+git clone https://github.com/cybermax-008/Acorn-tools.git
+cd Acorn-tools
 npm install
 npm run dev
 ```
@@ -58,7 +58,7 @@ Deploy the `dist/` folder to any static host (Vercel, Netlify, Cloudflare Pages,
 
 ## Image Processing Engine
 
-ZeroUpload uses a dual-engine system that auto-selects the best available option:
+Acorn Tools uses a dual-engine system that auto-selects the best available option:
 
 | Engine | Powered by | When it activates |
 |--------|-----------|-------------------|

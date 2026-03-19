@@ -53,7 +53,7 @@ async function saveFileCapacitor(blob, filename) {
       url: result.uri,
     });
   } catch (err) {
-    console.warn('[ZeroUpload] Capacitor save failed, falling back to browser:', err);
+    console.warn('[AcornTools] Capacitor save failed, falling back to browser:', err);
     saveFileBrowser(blob, filename);
   }
 }

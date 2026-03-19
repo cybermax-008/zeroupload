@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- * ZeroUpload PDF Engine
+ * Acorn Tools PDF Engine
  * 
  * All operations run client-side using pdf-lib.
  * Supports: merge, split/extract, image-to-PDF

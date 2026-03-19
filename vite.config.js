@@ -36,8 +36,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'ZeroUpload — Private PDF & Image Tools',
-        short_name: 'ZeroUpload',
+        name: 'Acorn Tools — Private PDF & Image Tools',
+        short_name: 'Acorn Tools',
         description: 'Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device.',
         theme_color: '#0a0a0b',
         background_color: '#0a0a0b',

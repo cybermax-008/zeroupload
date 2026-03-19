@@ -15,7 +15,7 @@ No test framework is configured. No linter is configured.
 
 ## Architecture
 
-ZeroUpload is a privacy-first file processing PWA (React 18 + Vite) that runs entirely client-side. No server-side processing — all file operations happen in-browser. Deploys as a static site or to iOS/Android via Capacitor.
+Acorn Tools is a privacy-first file processing PWA (React 18 + Vite) that runs entirely client-side. No server-side processing — all file operations happen in-browser. Deploys as a static site or to iOS/Android via Capacitor.
 
 ### Dual Image Engine (the core architectural pattern)
 
@@ -36,7 +36,9 @@ Engine state is stored as **module-level variables** (not React state) — a sin
 - `src/lib/pdfPageEngine.js` — Page-level PDF operations (reorder, delete, insert, thumbnails) using pdf-lib + pdfjs-dist.
 **Note:** pdf-lib does NOT support PDF encryption. Do not attempt `save({ userPassword })` — it silently produces an unencrypted file.
 
-**PDF Compression** uses pdfjs-dist to render each page to canvas, then re-encodes as JPEG at the user-selected quality. This means compressed PDFs lose text selectability.
+**PDF Compression** has two modes:
+- **Smart** (default): `src/lib/pdfSmartCompressEngine.js` enumerates embedded images via pdf-lib's `context.enumerateIndirectObjects()`, decodes DCTDecode/FlateDecode streams, runs SSIM-guided binary search for optimal MozJPEG quality, and replaces streams in-place. Preserves text, vectors, fonts. Uses `src/lib/ssim.js` for perceptual quality measurement.
+- **Aggressive**: Rasterizes every page to canvas via pdfjs-dist and re-encodes as JPEG. Smaller files but loses text selectability.
 
 ### Styling
 

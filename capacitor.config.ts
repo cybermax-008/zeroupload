@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.zeroupload.app',
-  appName: 'ZeroUpload',
+  appId: 'com.acorntools.app',
+  appName: 'Acorn Tools',
   webDir: 'dist',
   
   server: {
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
   // iOS-specific configuration
   ios: {
     contentInset: 'automatic',
-    scheme: 'ZeroUpload',
+    scheme: 'AcornTools',
     // Enable SharedArrayBuffer (required for wasm-vips)
     // Add to Info.plist: set COOP/COEP headers via WKWebView config
   },

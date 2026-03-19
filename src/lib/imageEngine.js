@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- * ZeroUpload Image Engine
+ * Acorn Tools Image Engine
  * 
  * Dual-engine architecture:
  *   1. wasm-vips (PRIMARY)  — libvips compiled to WASM, best quality
@@ -45,10 +45,10 @@ export async function initEngine(preferVips = true) {
           dynamicLibraries: [],
         });
         engineType = 'vips';
-        console.log('[ZeroUpload] Engine: wasm-vips (libvips) ✓');
+        console.log('[AcornTools] Engine: wasm-vips (libvips) ✓');
         return { engine: 'vips', quality: 'maximum' };
       } catch (err) {
-        console.warn('[ZeroUpload] wasm-vips failed, falling back to Pica:', err.message);
+        console.warn('[AcornTools] wasm-vips failed, falling back to Pica:', err.message);
       }
     }
 
@@ -59,7 +59,7 @@ export async function initEngine(preferVips = true) {
         features: ['js', 'wasm', 'ww'], // Use WASM + WebWorkers when available
       });
       engineType = 'pica';
-      console.log('[ZeroUpload] Engine: Pica (Lanczos3) ✓');
+      console.log('[AcornTools] Engine: Pica (Lanczos3) ✓');
       return { engine: 'pica', quality: 'high' };
     } catch (err) {
       throw new Error('Failed to initialize any image engine: ' + err.message);

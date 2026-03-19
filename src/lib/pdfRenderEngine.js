@@ -1,5 +1,5 @@
 /**
- * ZeroUpload PDF Render Engine
+ * Acorn Tools PDF Render Engine
  *
  * Renders PDF pages to images using pdfjs-dist.
  * Lazy-loaded — only imported when PDF→Image tab is used.

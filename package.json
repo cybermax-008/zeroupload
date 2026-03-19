@@ -1,16 +1,16 @@
 {
-  "name": "zeroupload",
+  "name": "acorn-tools",
   "version": "1.0.0",
-  "description": "ZeroUpload — Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline.",
+  "description": "Acorn Tools — Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cybermax-008/zeroupload.git"
+    "url": "https://github.com/cybermax-008/Acorn-tools.git"
   },
-  "homepage": "https://zeroupload-gold.vercel.app",
+  "homepage": "https://www.acorntools.net",
   "bugs": {
-    "url": "https://github.com/cybermax-008/zeroupload/issues"
+    "url": "https://github.com/cybermax-008/Acorn-tools/issues"
   },
   "keywords": [
     "pdf",
@@ -28,7 +28,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "cap:init": "cap init ZeroUpload com.zeroupload.app --web-dir dist",
+    "cap:init": "cap init AcornTools com.acorntools.app --web-dir dist",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
     "cap:sync": "npm run build && cap sync",

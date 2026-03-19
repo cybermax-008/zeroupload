@@ -1,5 +1,5 @@
 /**
- * ZeroUpload Metadata Engine
+ * Acorn Tools Metadata Engine
  *
  * Strips EXIF/metadata from images and PDFs.
  * All operations run client-side.
