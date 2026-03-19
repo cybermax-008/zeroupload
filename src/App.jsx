@@ -11,7 +11,7 @@ import PdfToImageTab from './components/PdfToImageTab';
 import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
-import { EngineIndicator, UsageCounter, ProBadge, PaywallModal } from './components/ui';
+import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, PricingSection } from './components/ui';
 
 const TOOLS = [
   {
@@ -131,6 +131,8 @@ export default function App() {
                 Acorn Tools
               </h1>
             </div>
+
+            {proUser ? <ProBadge /> : <UpgradeButton onClick={() => setShowPaywall(true)} />}
           </div>
 
           {!activeTool && (
@@ -175,7 +177,7 @@ export default function App() {
               }} />
             )}
 
-            {proUser ? <ProBadge /> : <UsageCounter usageInfo={usageInfo} />}
+            {!proUser && <UsageCounter usageInfo={usageInfo} />}
           </div>
         </header>
 
@@ -205,6 +207,11 @@ export default function App() {
               </div>
             ))}
           </div>
+        )}
+
+        {/* ── Pricing section (home only, free users only) ── */}
+        {!activeTool && !proUser && (
+          <PricingSection onUpgrade={() => setShowPaywall(true)} />
         )}
 
         {/* ── Active tool ── */}

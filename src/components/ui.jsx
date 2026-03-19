@@ -373,24 +373,218 @@ export function UsageCounter({ usageInfo }) {
 }
 
 // ══════════════════════════════════════════
-// ProBadge — Shows pro status
+// ProBadge — Shows pro status in header
 // ══════════════════════════════════════════
 export function ProBadge() {
   return (
     <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      padding: '3px 10px', borderRadius: 6,
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      padding: '6px 14px', borderRadius: 20,
       background: 'rgba(201,165,90,0.15)',
       border: '1px solid rgba(201,165,90,0.25)',
     }}>
       <span style={{
-        fontSize: 10, fontWeight: 700,
-        fontFamily: theme.fontMono,
+        color: theme.success, fontSize: 12, lineHeight: 1,
+      }}>✓</span>
+      <span style={{
+        fontSize: 12, fontWeight: 700,
         color: theme.accent,
-        letterSpacing: '0.06em',
+        letterSpacing: '0.04em',
       }}>
         PRO
       </span>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// UpgradeButton — Persistent header CTA
+// ══════════════════════════════════════════
+export function UpgradeButton({ onClick }) {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        fontFamily: theme.font,
+        fontSize: 12, fontWeight: 600,
+        padding: '7px 16px',
+        borderRadius: 20,
+        border: 'none',
+        background: hover ? theme.accentHover : theme.accent,
+        color: theme.bg,
+        cursor: 'pointer',
+        transition: theme.transition,
+        letterSpacing: '0.02em',
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}
+    >
+      Go Pro — $6.99
+    </button>
+  );
+}
+
+// ══════════════════════════════════════════
+// PricingSection — Free vs Pro comparison
+// ══════════════════════════════════════════
+export function PricingSection({ onUpgrade }) {
+  const [hoverPro, setHoverPro] = useState(false);
+
+  return (
+    <div style={{ marginTop: 36 }}>
+      <h2 style={{
+        fontSize: 12, fontWeight: 600,
+        color: theme.textMuted,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        marginBottom: 12,
+      }}>
+        Pricing
+      </h2>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: 12,
+      }}>
+        {/* Free tier */}
+        <div style={{
+          padding: '24px 20px',
+          borderRadius: theme.radius,
+          border: `1px solid ${theme.border}`,
+          background: theme.surface,
+          display: 'flex', flexDirection: 'column', gap: 16,
+        }}>
+          <div>
+            <div style={{
+              fontSize: 18, fontWeight: 700, color: theme.text,
+              marginBottom: 4,
+            }}>Free</div>
+            <div style={{
+              fontSize: 28, fontWeight: 700, color: theme.text,
+            }}>
+              $0
+            </div>
+          </div>
+
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            {[
+              '5 operations per day',
+              'All tools included',
+              '100% private processing',
+            ].map((text) => (
+              <div key={text} style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                fontSize: 13, color: theme.textMuted,
+              }}>
+                <span style={{ color: theme.success, fontSize: 13 }}>✓</span>
+                {text}
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            padding: '10px 20px',
+            borderRadius: 8,
+            border: `1px solid ${theme.border}`,
+            textAlign: 'center',
+            fontSize: 13, fontWeight: 500,
+            color: theme.textMuted,
+          }}>
+            Current plan
+          </div>
+        </div>
+
+        {/* Pro tier */}
+        <div style={{
+          padding: '24px 20px',
+          borderRadius: theme.radius,
+          border: `1px solid rgba(201,165,90,0.3)`,
+          background: theme.accentGlow,
+          display: 'flex', flexDirection: 'column', gap: 16,
+          position: 'relative',
+        }}>
+          <div style={{
+            position: 'absolute', top: -1, right: 16,
+            background: theme.accent,
+            color: theme.bg,
+            fontSize: 10, fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: '0 0 6px 6px',
+            letterSpacing: '0.04em',
+          }}>
+            BEST VALUE
+          </div>
+
+          <div>
+            <div style={{
+              fontSize: 18, fontWeight: 700, color: theme.accent,
+              marginBottom: 4,
+            }}>Pro</div>
+            <div style={{
+              display: 'flex', alignItems: 'baseline', gap: 6,
+            }}>
+              <span style={{
+                fontSize: 28, fontWeight: 700, color: theme.text,
+              }}>$6.99</span>
+              <span style={{
+                fontSize: 12, color: theme.textMuted,
+              }}>one-time</span>
+            </div>
+          </div>
+
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            {[
+              'Unlimited operations, forever',
+              'All current & future tools',
+              '100% private processing',
+              'Support independent development',
+            ].map((text) => (
+              <div key={text} style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                fontSize: 13, color: theme.textMuted,
+              }}>
+                <span style={{ color: theme.success, fontSize: 13 }}>✓</span>
+                {text}
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={onUpgrade}
+            onMouseEnter={() => setHoverPro(true)}
+            onMouseLeave={() => setHoverPro(false)}
+            style={{
+              fontFamily: theme.font,
+              fontSize: 14, fontWeight: 700,
+              padding: '12px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: hoverPro ? theme.accentHover : theme.accent,
+              color: theme.bg,
+              cursor: 'pointer',
+              transition: theme.transition,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Unlock Pro
+          </button>
+
+          <div style={{
+            fontSize: 11, color: theme.textDim,
+            textAlign: 'center',
+          }}>
+            One-time payment. No subscriptions. No recurring fees.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
