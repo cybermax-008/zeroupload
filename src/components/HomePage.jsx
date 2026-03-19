@@ -2,28 +2,32 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useOutletContext } from 'react-router-dom';
 import { theme } from '../lib/theme';
-import { ROUTE_BY_TOOL_ID, BASE_URL } from '../lib/routes';
+import { BASE_URL } from '../lib/routes';
 import { PricingSection } from './ui';
 
 const TOOLS = [
   {
     section: 'Image Tools',
     items: [
-      { id: 'resize',   icon: '⤡', label: 'Resize',          desc: 'Scale images to exact dimensions or presets' },
-      { id: 'compress', icon: '▼', label: 'Compress',        desc: 'Reduce file size with quality control' },
-      { id: 'convert',  icon: '⇄', label: 'Convert Format',  desc: 'PNG to JPG, WebP to PNG, and more' },
-      { id: 'crop',     icon: '⬒', label: 'Crop',            desc: 'Select and export a region of an image' },
-      { id: 'metadata', icon: '⊘', label: 'Strip Metadata',  desc: 'Remove GPS, device info, timestamps from images' },
+      { path: '/resize-image',   icon: '⤡', label: 'Resize',          desc: 'Scale images to exact dimensions or presets' },
+      { path: '/compress-image', icon: '▼', label: 'Compress',        desc: 'Reduce file size with quality control' },
+      { path: '/convert-image',  icon: '⇄', label: 'Convert Format',  desc: 'PNG to JPG, WebP to PNG, and more' },
+      { path: '/crop-image',     icon: '⬒', label: 'Crop',            desc: 'Select and export a region of an image' },
+      { path: '/strip-metadata', icon: '⊘', label: 'Strip Metadata',  desc: 'Remove GPS, device info, timestamps from images' },
     ],
   },
   {
     section: 'PDF Tools',
     items: [
-      { id: 'img2pdf',  icon: '▤', label: 'Image → PDF',     desc: 'Combine images into a single PDF document' },
-      { id: 'pdf2img',  icon: '▥', label: 'PDF → Image',     desc: 'Convert PDF pages to JPEG or PNG' },
-      { id: 'pdfcompress', icon: '▼', label: 'Compress PDF', desc: 'Reduce PDF file size' },
-      { id: 'pdftools', icon: '⊞', label: 'PDF Toolkit',     desc: 'Merge, split, rotate, watermark, page numbers' },
-      { id: 'pdforganize', icon: '⊞', label: 'Organize Pages', desc: 'Reorder, delete, and insert PDF pages' },
+      { path: '/image-to-pdf',      icon: '▤', label: 'Image → PDF',       desc: 'Combine images into a single PDF document' },
+      { path: '/pdf-to-image',      icon: '▥', label: 'PDF → Image',       desc: 'Convert PDF pages to JPEG or PNG' },
+      { path: '/compress-pdf',      icon: '▼', label: 'Compress PDF',      desc: 'Reduce PDF file size' },
+      { path: '/merge-pdf',         icon: '⊕', label: 'Merge PDFs',        desc: 'Combine multiple PDFs into one document' },
+      { path: '/split-pdf',         icon: '⊖', label: 'Split PDF',         desc: 'Extract pages or split into separate files' },
+      { path: '/rotate-pdf',        icon: '↻', label: 'Rotate PDF',        desc: 'Rotate pages 90°, 180°, or 270°' },
+      { path: '/watermark-pdf',     icon: '◈', label: 'Watermark PDF',     desc: 'Add text watermarks to PDF documents' },
+      { path: '/pdf-page-numbers',  icon: '#', label: 'Page Numbers',      desc: 'Add page numbers to PDF documents' },
+      { path: '/pdf-pages',         icon: '⊞', label: 'Organize Pages',    desc: 'Reorder, delete, and insert PDF pages' },
     ],
   },
 ];
@@ -60,7 +64,7 @@ export default function HomePage() {
               gap: 10,
             }}>
               {section.items.map((t) => (
-                <ToolCard key={t.id} tool={t} />
+                <ToolCard key={t.path} tool={t} />
               ))}
             </div>
           </div>
@@ -76,11 +80,10 @@ export default function HomePage() {
 
 function ToolCard({ tool }) {
   const [hover, setHover] = useState(false);
-  const route = ROUTE_BY_TOOL_ID[tool.id];
 
   return (
     <Link
-      to={route?.path || '/'}
+      to={tool.path}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
