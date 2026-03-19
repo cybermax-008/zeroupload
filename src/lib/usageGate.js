@@ -17,7 +17,7 @@ const KEYS = {
 };
 
 // TODO: Replace with your actual Stripe Payment Link
-export const STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/YOUR_PAYMENT_LINK';
+export const STRIPE_CHECKOUT_URL = 'https://buy.stripe.com/eVqbJ048g1sgb6l700dby00';
 
 function today() {
   return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
