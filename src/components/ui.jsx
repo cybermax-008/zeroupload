@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { theme } from '../lib/theme';
 import { humanSize } from '../lib/fileUtils';
-import { STRIPE_CHECKOUT_URL } from '../lib/usageGate';
+import { STRIPE_CHECKOUT_URL, verifyLicenseKey } from '../lib/usageGate';
 
 // ══════════════════════════════════════════
 // DropZone — Drag & drop file input
@@ -592,7 +592,7 @@ export function PricingSection({ onUpgrade }) {
 // ══════════════════════════════════════════
 // PaywallModal — Shown when free limit hit
 // ══════════════════════════════════════════
-export function PaywallModal({ onClose, limitReached }) {
+export function PaywallModal({ onClose, limitReached, onRestore }) {
   return (
     <div
       onClick={onClose}
@@ -715,6 +715,316 @@ export function PaywallModal({ onClose, limitReached }) {
           onMouseLeave={(e) => e.target.style.color = theme.textDim}
         >
           {limitReached ? 'Continue tomorrow for free' : 'Maybe later'}
+        </button>
+
+        <button
+          onClick={onRestore}
+          style={{
+            fontFamily: theme.font,
+            fontSize: 12, fontWeight: 500,
+            color: theme.accent,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            marginTop: 8,
+            padding: '4px 8px',
+            transition: theme.transitionFast,
+          }}
+          onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.target.style.opacity = '1'}
+        >
+          Already purchased? Restore license
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// RestoreModal — Enter license key
+// ══════════════════════════════════════════
+export function RestoreModal({ onClose, onRestored }) {
+  const [key, setKey] = useState('');
+  const [status, setStatus] = useState(''); // '' | 'verifying' | 'success' | 'error'
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleVerify = async () => {
+    if (!key.trim()) return;
+    setStatus('verifying');
+    setErrorMsg('');
+
+    const result = await verifyLicenseKey(key);
+    if (result.valid) {
+      setStatus('success');
+      setTimeout(() => onRestored(), 1200);
+    } else {
+      setStatus('error');
+      setErrorMsg(result.error || 'Invalid license key');
+    }
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 10000,
+        background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 20,
+        animation: 'fadeIn .2s ease',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.border}`,
+          borderRadius: theme.radiusLg,
+          padding: '32px 28px',
+          maxWidth: 400,
+          width: '100%',
+          animation: 'slideUp .3s ease',
+        }}
+      >
+        <h2 style={{
+          fontSize: 18, fontWeight: 700,
+          color: theme.text,
+          marginBottom: 6,
+        }}>
+          Restore Purchase
+        </h2>
+
+        <p style={{
+          fontSize: 13, color: theme.textMuted,
+          lineHeight: 1.5, marginBottom: 20,
+        }}>
+          Enter the license key from your purchase confirmation email.
+        </p>
+
+        <input
+          type="text"
+          value={key}
+          onChange={(e) => { setKey(e.target.value); setStatus(''); setErrorMsg(''); }}
+          placeholder="cs_live_..."
+          autoFocus
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: `1px solid ${status === 'error' ? theme.error : theme.border}`,
+            background: theme.bg,
+            color: theme.text,
+            fontSize: 13,
+            fontFamily: theme.fontMono,
+            outline: 'none',
+            transition: theme.transitionFast,
+            marginBottom: 8,
+          }}
+          onFocus={(e) => { if (status !== 'error') e.target.style.borderColor = theme.accent; }}
+          onBlur={(e) => { if (status !== 'error') e.target.style.borderColor = theme.border; }}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleVerify(); }}
+        />
+
+        {errorMsg && (
+          <p style={{
+            fontSize: 12, color: theme.error,
+            marginBottom: 8,
+          }}>
+            {errorMsg}
+          </p>
+        )}
+
+        {status === 'success' && (
+          <p style={{
+            fontSize: 12, color: theme.success,
+            fontWeight: 500, marginBottom: 8,
+          }}>
+            License verified! Pro unlocked.
+          </p>
+        )}
+
+        <div style={{
+          display: 'flex', gap: 8, marginTop: 12,
+        }}>
+          <button
+            onClick={handleVerify}
+            disabled={!key.trim() || status === 'verifying' || status === 'success'}
+            style={{
+              fontFamily: theme.font,
+              fontSize: 13, fontWeight: 600,
+              padding: '10px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: (!key.trim() || status === 'verifying' || status === 'success')
+                ? theme.border : theme.accent,
+              color: (!key.trim() || status === 'verifying' || status === 'success')
+                ? theme.textDim : theme.bg,
+              cursor: (!key.trim() || status === 'verifying' || status === 'success')
+                ? 'not-allowed' : 'pointer',
+              transition: theme.transition,
+              flex: 1,
+            }}
+          >
+            {status === 'verifying' ? 'Verifying…' : status === 'success' ? 'Verified ✓' : 'Verify'}
+          </button>
+
+          <button
+            onClick={onClose}
+            style={{
+              fontFamily: theme.font,
+              fontSize: 13, fontWeight: 500,
+              padding: '10px 20px',
+              borderRadius: 8,
+              border: `1px solid ${theme.border}`,
+              background: 'transparent',
+              color: theme.textMuted,
+              cursor: 'pointer',
+              transition: theme.transition,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// LicenseKeyDisplay — Shown after payment
+// ══════════════════════════════════════════
+export function LicenseKeyDisplay({ licenseKey, onClose }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(licenseKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = licenseKey;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 10000,
+        background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 20,
+        animation: 'fadeIn .2s ease',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.border}`,
+          borderRadius: theme.radiusLg,
+          padding: '32px 28px',
+          maxWidth: 440,
+          width: '100%',
+          textAlign: 'center',
+          animation: 'slideUp .3s ease',
+        }}
+      >
+        <div style={{
+          fontSize: 36, marginBottom: 12,
+          color: theme.success,
+        }}>
+          ✓
+        </div>
+
+        <h2 style={{
+          fontSize: 20, fontWeight: 700,
+          color: theme.text,
+          marginBottom: 6,
+        }}>
+          Welcome to Pro!
+        </h2>
+
+        <p style={{
+          fontSize: 13, color: theme.textMuted,
+          lineHeight: 1.5, marginBottom: 20,
+        }}>
+          Save your license key — use it to restore Pro on any device or browser.
+        </p>
+
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: theme.bg,
+          border: `1px solid ${theme.border}`,
+          borderRadius: 8,
+          padding: '10px 12px',
+          marginBottom: 16,
+        }}>
+          <code style={{
+            flex: 1,
+            fontSize: 11,
+            fontFamily: theme.fontMono,
+            color: theme.text,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textAlign: 'left',
+          }}>
+            {licenseKey}
+          </code>
+
+          <button
+            onClick={handleCopy}
+            style={{
+              fontFamily: theme.font,
+              fontSize: 11, fontWeight: 500,
+              padding: '4px 10px',
+              borderRadius: 5,
+              border: `1px solid ${theme.border}`,
+              background: copied ? theme.successDim : 'transparent',
+              color: copied ? theme.success : theme.textMuted,
+              cursor: 'pointer',
+              transition: theme.transitionFast,
+              flexShrink: 0,
+            }}
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+
+        <p style={{
+          fontSize: 11, color: theme.textDim,
+          lineHeight: 1.5, marginBottom: 20,
+        }}>
+          This key is also in your Stripe receipt email.
+        </p>
+
+        <button
+          onClick={onClose}
+          style={{
+            fontFamily: theme.font,
+            fontSize: 14, fontWeight: 600,
+            padding: '11px 28px',
+            borderRadius: 8,
+            border: 'none',
+            background: theme.accent,
+            color: theme.bg,
+            cursor: 'pointer',
+            width: '100%',
+            transition: theme.transition,
+          }}
+          onMouseEnter={(e) => e.target.style.background = theme.accentHover}
+          onMouseLeave={(e) => e.target.style.background = theme.accent}
+        >
+          Start using Pro
         </button>
       </div>
     </div>

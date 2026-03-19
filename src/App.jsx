@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { theme, globalStyles } from './lib/theme';
 import { initEngine, getEngineInfo, destroyEngine } from './lib/imageEngine';
-import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo } from './lib/usageGate';
+import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo, getLicenseKey } from './lib/usageGate';
 import ResizeTab from './components/ResizeTab';
 import CompressTab from './components/CompressTab';
 import ConvertTab from './components/ConvertTab';
@@ -11,7 +11,7 @@ import PdfToImageTab from './components/PdfToImageTab';
 import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
-import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, PricingSection } from './components/ui';
+import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, PricingSection, RestoreModal, LicenseKeyDisplay } from './components/ui';
 
 const TOOLS = [
   {
@@ -47,14 +47,23 @@ export default function App() {
   const [proUser, setProUser] = useState(isPro);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallLimitReached, setPaywallLimitReached] = useState(false);
+  const [showRestore, setShowRestore] = useState(false);
+  const [showLicenseKey, setShowLicenseKey] = useState(false);
+  const [licenseKey, setLicenseKey] = useState('');
   const [usageInfo, setUsageInfo] = useState(getUsageInfo);
 
   useEffect(() => {
     setMounted(true);
     // Handle Stripe redirect
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
     if (checkStripeRedirect()) {
       setProUser(true);
       setUsageInfo(getUsageInfo());
+      if (sessionId) {
+        setLicenseKey(sessionId);
+        setShowLicenseKey(true);
+      }
     }
     initEngine(true).then((info) => {
       setEngineInfo(info);
@@ -273,7 +282,10 @@ export default function App() {
         )}
 
         {showPaywall && (
-          <PaywallModal limitReached={paywallLimitReached} onClose={() => {
+          <PaywallModal limitReached={paywallLimitReached} onRestore={() => {
+            setShowPaywall(false);
+            setShowRestore(true);
+          }} onClose={() => {
             setShowPaywall(false);
             // Re-check in case user completed payment in another tab
             if (isPro()) {
@@ -281,6 +293,24 @@ export default function App() {
               setUsageInfo(getUsageInfo());
             }
           }} />
+        )}
+
+        {showRestore && (
+          <RestoreModal
+            onClose={() => setShowRestore(false)}
+            onRestored={() => {
+              setShowRestore(false);
+              setProUser(true);
+              setUsageInfo(getUsageInfo());
+            }}
+          />
+        )}
+
+        {showLicenseKey && licenseKey && (
+          <LicenseKeyDisplay
+            licenseKey={licenseKey}
+            onClose={() => setShowLicenseKey(false)}
+          />
         )}
 
         {/* ── Footer ── */}
@@ -336,6 +366,26 @@ export default function App() {
               </svg>
               Send Feedback
             </a>
+            {!proUser && (
+              <>
+                <span style={{ color: theme.textDim }}>·</span>
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); setShowRestore(true); }}
+                  style={{
+                    color: theme.textMuted,
+                    textDecoration: 'none',
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    transition: theme.transition,
+                    fontSize: 11,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = theme.accent}
+                  onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+                >
+                  Restore Purchase
+                </a>
+              </>
+            )}
           </div>
         </footer>
       </div>

@@ -85,3 +85,31 @@ export function recordOperation() {
   const used = getUsageToday();
   localStorage.setItem(KEYS.usageCount, String(used + 1));
 }
+
+/**
+ * Get the stored license key (Stripe session ID).
+ */
+export function getLicenseKey() {
+  return localStorage.getItem(KEYS.proSession) || '';
+}
+
+/**
+ * Verify a license key against the server.
+ * Returns { valid: true } or { valid: false, error: string }.
+ */
+export async function verifyLicenseKey(key) {
+  try {
+    const res = await fetch('/api/verify-license', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key.trim() }),
+    });
+    const data = await res.json();
+    if (data.valid) {
+      activatePro(key.trim());
+    }
+    return data;
+  } catch {
+    return { valid: false, error: 'Network error. Please try again.' };
+  }
+}
