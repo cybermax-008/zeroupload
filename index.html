@@ -49,19 +49,21 @@
         document.documentElement.setAttribute('data-theme', t);
         if (t === 'light') document.querySelector('meta[name="theme-color"]').content = '#f7f7f8';
       })();
-      // Force stale service workers to update — bump version on breaking deploys
-      (function(){
-        var SW_VERSION = 2;
-        var key = 'acorntools-sw-version';
-        var stored = parseInt(localStorage.getItem(key)) || 0;
-        if (stored < SW_VERSION && 'serviceWorker' in navigator) {
-          localStorage.setItem(key, SW_VERSION);
-          navigator.serviceWorker.getRegistrations().then(function(regs) {
-            regs.forEach(function(r) { r.unregister(); });
-            if (regs.length) location.reload();
-          });
-        }
-      })();
+      // Auto-reload when a new service worker takes control
+      // This handles the case where skipWaiting() activates a new SW
+      // while the old one was serving stale content
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (!window.__swReloading) {
+            window.__swReloading = true;
+            location.reload();
+          }
+        });
+        // Also force-check for SW updates immediately
+        navigator.serviceWorker.ready.then(function(reg) {
+          reg.update();
+        });
+      }
     </script>
   </head>
   <body>
