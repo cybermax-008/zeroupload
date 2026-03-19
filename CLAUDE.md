@@ -50,11 +50,24 @@ All styling is inline React style objects — no CSS files or class names. Desig
 - Browser: blob URL + `<a download>`
 - Capacitor: `Filesystem.writeFile()` + native Share sheet
 
+### Usage Gate & Monetization
+
+`src/lib/usageGate.js` — client-side usage tracking with localStorage. Free users get 5 operations/day; Pro users get unlimited. Gate checks happen at processing time via `onBeforeProcess`/`onOperationComplete` callbacks passed from `App.jsx` to all tool tabs.
+
+- **Stripe Payment Link** for $6.99 one-time purchase. URL hardcoded in `usageGate.js`.
+- **License key** = Stripe Checkout Session ID. Shown after payment, verifiable via `/api/verify-license`.
+- **Restore Purchase** flow: user pastes license key → serverless function verifies with Stripe API.
+- **Capacitor builds** bypass the gate entirely (`isCapacitor()` → always pro).
+
+`api/verify-license.js` — Vercel serverless function that validates license keys against Stripe API. Requires `STRIPE_SECRET_KEY` env var.
+
 ### Component Structure
 
-Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, etc.) live in `src/components/ui.jsx` with no domain logic.
+Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, `PaywallModal`, `RestoreModal`, etc.) live in `src/components/ui.jsx` with no domain logic.
 
 ## Deployment
+
+Hosted on **Vercel** at `www.acorntools.net`. `vercel.json` configures COOP/COEP headers and the `/api` serverless functions.
 
 Production hosting **must** serve these headers for wasm-vips to work (without them, Pica.js fallback activates automatically):
 
@@ -63,4 +76,4 @@ Cross-Origin-Embedder-Policy: require-corp
 Cross-Origin-Opener-Policy: same-origin
 ```
 
-These are already configured in `vite.config.js` for dev/preview servers.
+These are configured in `vercel.json` for production and `vite.config.js` for dev/preview servers.
