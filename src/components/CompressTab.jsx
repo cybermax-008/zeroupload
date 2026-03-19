@@ -7,7 +7,6 @@ import { DropZone, FileChip, Btn, Toggle, StatusBadge, NumInput } from './ui';
 const LOSSY_FORMATS = [
   ['image/jpeg', 'JPEG'],
   ['image/webp', 'WebP'],
-  ['image/png', 'PNG'],
 ];
 
 export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
