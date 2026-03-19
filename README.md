@@ -3,6 +3,8 @@
 [![Build](https://github.com/cybermax-008/Acorn-tools/actions/workflows/build.yml/badge.svg)](https://github.com/cybermax-008/Acorn-tools/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+![Acorn Tools — Private PDF & image tools](public/social-preview.png)
+
 **Private PDF & image tools that run entirely on your device.**
 
 **[Try it live](https://www.acorntools.net)** — No uploads. No servers. No tracking. Every operation happens in your browser — your files never leave your machine.
