@@ -163,6 +163,9 @@ export default function PdfPageOrganizerTab({ onBeforeProcess, onOperationComple
                     onDragOver={(e) => handleDragOver(e, idx)}
                     onDrop={handleDrop}
                     onClick={() => toggleSelect(idx)}
+                    role="checkbox"
+                    aria-checked={selected.has(idx)}
+                    aria-label={`Page ${idx + 1}`}
                     style={{
                       cursor: 'grab',
                       border: `2px solid ${selected.has(idx) ? theme.accent : theme.border}`,

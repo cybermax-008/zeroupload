@@ -257,7 +257,7 @@ export function StatusBadge({ status }) {
 // ══════════════════════════════════════════
 // NumInput — Labeled number input
 // ══════════════════════════════════════════
-export function NumInput({ value, onChange, label, suffix }) {
+export function NumInput({ value, onChange, label, suffix, min }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       {label && (
@@ -269,6 +269,7 @@ export function NumInput({ value, onChange, label, suffix }) {
       <input
         type="number"
         value={value}
+        min={min ?? 0}
         onChange={(e) => onChange(e.target.value)}
         style={{
           width: 88, padding: '7px 10px',
@@ -354,12 +355,16 @@ export function UsageCounter({ usageInfo }) {
   if (!usageInfo || usageInfo.isPro) return null;
 
   return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      padding: '3px 10px', borderRadius: 6,
-      background: usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim,
-      border: `1px solid ${usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim}`,
-    }}>
+    <div
+      title={`${usageInfo.remaining} of ${usageInfo.total} free operations remaining today. Resets at midnight. Go Pro for unlimited.`}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        padding: '3px 10px', borderRadius: 6,
+        background: usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim,
+        border: `1px solid ${usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim}`,
+        cursor: 'help',
+      }}
+    >
       <span style={{
         fontSize: 10, fontWeight: 500,
         fontFamily: theme.fontMono,
@@ -805,7 +810,7 @@ export function RestoreModal({ onClose, onRestored }) {
           type="text"
           value={key}
           onChange={(e) => { setKey(e.target.value); setStatus(''); setErrorMsg(''); }}
-          placeholder="cs_live_..."
+          placeholder="Paste your license key"
           autoFocus
           style={{
             width: '100%',

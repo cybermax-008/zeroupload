@@ -27,21 +27,21 @@ const darkColors = {
 };
 
 const lightColors = {
-  bg:           '#f7f7f8',
+  bg:           '#f5f5f6',
   surface:      '#ffffff',
-  surfaceHover: '#f0eff2',
+  surfaceHover: '#eeedf1',
   surfaceAlt:   '#fafafa',
-  border:       '#dfdee3',
-  borderActive: '#c0bfc8',
+  border:       '#d4d3d9',
+  borderActive: '#b0aeb8',
   text:         '#1a1a1d',
-  textMuted:    '#6b6976',
-  textDim:      '#b0adb8',
-  accent:       '#a8872e',
-  accentDim:    'rgba(168,135,46,0.12)',
-  accentGlow:   'rgba(168,135,46,0.06)',
-  accentHover:  '#c09e38',
-  success:      '#2d8a4e',
-  successDim:   'rgba(45,138,78,0.12)',
+  textMuted:    '#5c5966',
+  textDim:      '#908d9a',
+  accent:       '#8f7420',
+  accentDim:    'rgba(143,116,32,0.14)',
+  accentGlow:   'rgba(143,116,32,0.07)',
+  accentHover:  '#a6882e',
+  success:      '#1b7a3d',
+  successDim:   'rgba(27,122,61,0.12)',
   error:        '#c43c3c',
   errorDim:     'rgba(196,60,60,0.10)',
   overlay:      'rgba(0,0,0,0.45)',
@@ -225,6 +225,15 @@ export const globalStyles = `
   /* Mobile-friendly touch targets */
   @media (max-width: 640px) {
     button { min-height: 44px; }
+  }
+
+  /* Respect reduced-motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* Capacitor safe areas */

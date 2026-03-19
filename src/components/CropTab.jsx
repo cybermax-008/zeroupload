@@ -261,19 +261,19 @@ export default function CropTab({ onBeforeProcess, onOperationComplete }) {
             />
 
             {/* Corner handles */}
-            <div onPointerDown={(e) => onPointerDown(e, 'nw')} style={{
+            <div aria-label="Resize top-left" role="slider" onPointerDown={(e) => onPointerDown(e, 'nw')} style={{
               ...handleStyle('nw-resize'),
               left: toDisplay(crop.x) - 6, top: toDisplay(crop.y) - 6,
             }} />
-            <div onPointerDown={(e) => onPointerDown(e, 'ne')} style={{
+            <div aria-label="Resize top-right" role="slider" onPointerDown={(e) => onPointerDown(e, 'ne')} style={{
               ...handleStyle('ne-resize'),
               left: toDisplay(crop.x + crop.w) - 6, top: toDisplay(crop.y) - 6,
             }} />
-            <div onPointerDown={(e) => onPointerDown(e, 'sw')} style={{
+            <div aria-label="Resize bottom-left" role="slider" onPointerDown={(e) => onPointerDown(e, 'sw')} style={{
               ...handleStyle('sw-resize'),
               left: toDisplay(crop.x) - 6, top: toDisplay(crop.y + crop.h) - 6,
             }} />
-            <div onPointerDown={(e) => onPointerDown(e, 'se')} style={{
+            <div aria-label="Resize bottom-right" role="slider" onPointerDown={(e) => onPointerDown(e, 'se')} style={{
               ...handleStyle('se-resize'),
               left: toDisplay(crop.x + crop.w) - 6, top: toDisplay(crop.y + crop.h) - 6,
             }} />

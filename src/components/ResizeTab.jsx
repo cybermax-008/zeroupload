@@ -160,6 +160,8 @@ export default function ResizeTab({ onBeforeProcess, onOperationComplete }) {
                 <NumInput label="W" value={width} onChange={onW} suffix="px" />
                 <button
                   onClick={() => setLock(!lock)}
+                  aria-label={lock ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+                  title={lock ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
                   style={{
                     border: 'none', borderRadius: 6,
                     padding: '6px 10px', cursor: 'pointer',
@@ -167,7 +169,6 @@ export default function ResizeTab({ onBeforeProcess, onOperationComplete }) {
                     color: lock ? theme.accent : theme.textDim,
                     fontSize: 13,
                     transition: theme.transition,
-                    title: lock ? 'Unlock aspect ratio' : 'Lock aspect ratio',
                   }}
                 >
                   {lock ? '🔗' : '🔓'}
