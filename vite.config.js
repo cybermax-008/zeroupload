@@ -14,6 +14,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB for wasm binaries
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
+        // Activate new service worker immediately — prevents stale cache issues
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             // Cache CDN resources (fonts, etc.)

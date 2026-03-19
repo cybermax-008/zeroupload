@@ -31,6 +31,16 @@ function hasCrossOriginIsolation() {
   return typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated;
 }
 
+// ── Timeout helper ──
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
+    ),
+  ]);
+}
+
 // ── Initialize engine ──
 export async function initEngine(preferVips = true) {
   if (initPromise) return initPromise;
@@ -40,15 +50,17 @@ export async function initEngine(preferVips = true) {
     if (preferVips && hasSharedArrayBuffer() && hasCrossOriginIsolation()) {
       try {
         const Vips = (await import('wasm-vips')).default;
-        vipsInstance = await Vips({
-          // Limit memory on mobile devices
-          dynamicLibraries: [],
-        });
+        vipsInstance = await withTimeout(
+          Vips({ dynamicLibraries: [] }),
+          30000,
+          'wasm-vips init'
+        );
         engineType = 'vips';
         console.log('[AcornTools] Engine: wasm-vips (libvips) ✓');
         return { engine: 'vips', quality: 'maximum' };
       } catch (err) {
         console.warn('[AcornTools] wasm-vips failed, falling back to Pica:', err.message);
+        vipsInstance = null;
       }
     }
 
@@ -230,8 +242,17 @@ export async function resizeImage(input, targetW, targetH, format = 'image/png',
   await initEngine();
 
   if (engineType === 'vips') {
-    const buffer = await toVipsBuffer(input);
-    return resizeVips(buffer, targetW, targetH, format, quality, options);
+    try {
+      const buffer = await toVipsBuffer(input);
+      return await withTimeout(
+        resizeVips(buffer, targetW, targetH, format, quality, options),
+        60000,
+        'Image resize'
+      );
+    } catch (err) {
+      console.warn('[AcornTools] vips resize failed, falling back to Pica:', err.message);
+      // Fall through to Pica path below
+    }
   }
 
   // Pica path — needs an HTMLImageElement
@@ -256,14 +277,18 @@ export async function convertFormat(input, format, quality = 0.92) {
   await initEngine();
 
   if (engineType === 'vips') {
-    const buffer = await toVipsBuffer(input);
-    const vips = vipsInstance;
-    const img = vips.Image.newFromBuffer(buffer);
-    const ext = VIPS_FORMAT_MAP[format] || '.png';
-    const saveOpts = VIPS_SAVE_OPTIONS[format]?.(quality) || {};
-    const outBuffer = img.writeToBuffer(ext, saveOpts);
-    img.delete();
-    return new Blob([outBuffer], { type: format });
+    try {
+      const buffer = await toVipsBuffer(input);
+      const vips = vipsInstance;
+      const img = vips.Image.newFromBuffer(buffer);
+      const ext = VIPS_FORMAT_MAP[format] || '.png';
+      const saveOpts = VIPS_SAVE_OPTIONS[format]?.(quality) || {};
+      const outBuffer = img.writeToBuffer(ext, saveOpts);
+      img.delete();
+      return new Blob([outBuffer], { type: format });
+    } catch (err) {
+      console.warn('[AcornTools] vips convert failed, falling back to Canvas:', err.message);
+    }
   }
 
   // Pica/Canvas path
@@ -318,29 +343,28 @@ export async function compressImage(input, format = 'image/jpeg', quality = 0.7,
   await initEngine();
 
   if (engineType === 'vips') {
-    const buffer = await toVipsBuffer(input);
-    const vips = vipsInstance;
-    let img;
-
-    if (maxDimension) {
-      img = vips.Image.thumbnailBuffer(buffer, maxDimension, {
-        height: maxDimension,
-        size: 'down',
-        no_rotate: true,
-      });
-    } else {
-      img = vips.Image.newFromBuffer(buffer);
-    }
-
     try {
+      const buffer = await toVipsBuffer(input);
+      const vips = vipsInstance;
+      let img;
+
+      if (maxDimension) {
+        img = vips.Image.thumbnailBuffer(buffer, maxDimension, {
+          height: maxDimension,
+          size: 'down',
+          no_rotate: true,
+        });
+      } else {
+        img = vips.Image.newFromBuffer(buffer);
+      }
+
       const ext = VIPS_FORMAT_MAP[format] || '.jpg';
       const saveOpts = VIPS_SAVE_OPTIONS[format]?.(quality) || {};
       const outBuffer = img.writeToBuffer(ext, saveOpts);
       img.delete();
       return new Blob([outBuffer], { type: format });
     } catch (err) {
-      img.delete();
-      throw err;
+      console.warn('[AcornTools] vips compress failed, falling back to Canvas:', err.message);
     }
   }
 
@@ -381,20 +405,24 @@ export async function cropImage(input, x, y, width, height, format = 'image/png'
   await initEngine();
 
   if (engineType === 'vips') {
-    const buffer = await toVipsBuffer(input);
-    const vips = vipsInstance;
-    const img = vips.Image.newFromBuffer(buffer);
     try {
-      const cropped = img.extractArea(x, y, width, height);
-      const ext = VIPS_FORMAT_MAP[format] || '.png';
-      const saveOpts = VIPS_SAVE_OPTIONS[format]?.(quality) || {};
-      const outBuffer = cropped.writeToBuffer(ext, saveOpts);
-      cropped.delete();
-      img.delete();
-      return new Blob([outBuffer], { type: format });
+      const buffer = await toVipsBuffer(input);
+      const vips = vipsInstance;
+      const img = vips.Image.newFromBuffer(buffer);
+      try {
+        const cropped = img.extractArea(x, y, width, height);
+        const ext = VIPS_FORMAT_MAP[format] || '.png';
+        const saveOpts = VIPS_SAVE_OPTIONS[format]?.(quality) || {};
+        const outBuffer = cropped.writeToBuffer(ext, saveOpts);
+        cropped.delete();
+        img.delete();
+        return new Blob([outBuffer], { type: format });
+      } catch (err) {
+        img.delete();
+        throw err;
+      }
     } catch (err) {
-      img.delete();
-      throw err;
+      console.warn('[AcornTools] vips crop failed, falling back to Canvas:', err.message);
     }
   }
 
