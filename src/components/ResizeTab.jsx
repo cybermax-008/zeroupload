@@ -6,7 +6,7 @@ import { DropZone, FileChip, Btn, Toggle, StatusBadge, NumInput, EngineIndicator
 
 const FORMATS = Object.entries(FORMAT_MAP).map(([value, { label }]) => [value, label]);
 
-export default function ResizeTab() {
+export default function ResizeTab({ onBeforeProcess, onOperationComplete }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [origW, setOrigW] = useState(0);
@@ -55,6 +55,7 @@ export default function ResizeTab() {
 
   const process = async () => {
     if (!file) return;
+    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     const engineLabel = engineInfo.type === 'vips' ? 'libvips' : 'Lanczos3';
     setStatus(`Processing with ${engineLabel}…`);
@@ -71,6 +72,7 @@ export default function ResizeTab() {
       const ext = FORMAT_MAP[format]?.ext || '.png';
       await saveFile(blob, baseName(file.name) + `_${w}x${h}` + ext);
       setStatus('Exported ✓');
+      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

@@ -135,6 +135,11 @@ export const globalStyles = `
     to { opacity: 1; }
   }
 
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   @keyframes pulse {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 1; }

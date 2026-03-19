@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { theme, globalStyles } from './lib/theme';
 import { initEngine, getEngineInfo, destroyEngine } from './lib/imageEngine';
+import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo } from './lib/usageGate';
 import ResizeTab from './components/ResizeTab';
 import CompressTab from './components/CompressTab';
 import ConvertTab from './components/ConvertTab';
@@ -10,7 +11,7 @@ import PdfToImageTab from './components/PdfToImageTab';
 import PdfToolsTab from './components/PdfToolsTab';
 import MetadataStripTab from './components/MetadataStripTab';
 import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
-import { EngineIndicator } from './components/ui';
+import { EngineIndicator, UsageCounter, ProBadge, PaywallModal } from './components/ui';
 
 const TOOLS = [
   {
@@ -43,15 +44,34 @@ export default function App() {
   const [activeTool, setActiveTool] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [engineInfo, setEngineInfo] = useState(null);
+  const [proUser, setProUser] = useState(isPro);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [usageInfo, setUsageInfo] = useState(getUsageInfo);
 
   useEffect(() => {
     setMounted(true);
+    // Handle Stripe redirect
+    if (checkStripeRedirect()) {
+      setProUser(true);
+      setUsageInfo(getUsageInfo());
+    }
     initEngine(true).then((info) => {
       setEngineInfo(info);
     }).catch((err) => {
       console.error('[AcornTools] Engine init failed:', err);
     });
     return () => { destroyEngine(); };
+  }, []);
+
+  const handleBeforeProcess = useCallback(() => {
+    if (canUseOperation()) return true;
+    setShowPaywall(true);
+    return false;
+  }, []);
+
+  const handleOperationComplete = useCallback(() => {
+    recordOperation();
+    setUsageInfo(getUsageInfo());
   }, []);
 
   const tool = TOOL_MAP[activeTool];
@@ -154,6 +174,8 @@ export default function App() {
                 ready: true,
               }} />
             )}
+
+            {proUser ? <ProBadge /> : <UsageCounter usageInfo={usageInfo} />}
           </div>
         </header>
 
@@ -227,18 +249,29 @@ export default function App() {
               borderRadius: theme.radiusLg,
               padding: '28px 24px',
             }}>
-              {activeTool === 'resize' && <ResizeTab />}
-              {activeTool === 'compress' && <CompressTab />}
-              {activeTool === 'convert' && <ConvertTab />}
-              {activeTool === 'crop' && <CropTab />}
-              {activeTool === 'img2pdf' && <ImgToPdfTab />}
-              {activeTool === 'pdf2img' && <PdfToImageTab />}
-              {activeTool === 'pdfcompress' && <PdfToolsTab defaultMode="compress" />}
-              {activeTool === 'pdftools' && <PdfToolsTab />}
-              {activeTool === 'metadata' && <MetadataStripTab />}
-              {activeTool === 'pdforganize' && <PdfPageOrganizerTab />}
+              {activeTool === 'resize' && <ResizeTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'compress' && <CompressTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'convert' && <ConvertTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'crop' && <CropTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'img2pdf' && <ImgToPdfTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'pdf2img' && <PdfToImageTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'pdfcompress' && <PdfToolsTab defaultMode="compress" onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'pdftools' && <PdfToolsTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'metadata' && <MetadataStripTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
+              {activeTool === 'pdforganize' && <PdfPageOrganizerTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
             </main>
           </>
+        )}
+
+        {showPaywall && (
+          <PaywallModal onClose={() => {
+            setShowPaywall(false);
+            // Re-check in case user completed payment in another tab
+            if (isPro()) {
+              setProUser(true);
+              setUsageInfo(getUsageInfo());
+            }
+          }} />
         )}
 
         {/* ── Footer ── */}

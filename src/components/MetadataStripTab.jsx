@@ -9,7 +9,7 @@ import {
 import { saveFile, baseName, humanSize, readAsArrayBuffer } from '../lib/fileUtils';
 import { DropZone, FileChip, Btn, StatusBadge } from './ui';
 
-export default function MetadataStripTab() {
+export default function MetadataStripTab({ onBeforeProcess, onOperationComplete }) {
   const [file, setFile] = useState(null);
   const [metadata, setMetadata] = useState([]);
   const [status, setStatus] = useState('');
@@ -43,6 +43,7 @@ export default function MetadataStripTab() {
 
   const process = async () => {
     if (!file) return;
+    if (onBeforeProcess && !onBeforeProcess()) return;
     setStatus('Stripping metadata…');
     try {
       let result;
@@ -54,6 +55,7 @@ export default function MetadataStripTab() {
       const ext = isPdf ? '.pdf' : file.name.match(/\.\w+$/)?.[0] || '.jpg';
       await saveFile(result.blob, baseName(file.name) + '_clean' + ext);
       setStatus('Metadata stripped ✓');
+      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

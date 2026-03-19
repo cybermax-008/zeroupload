@@ -10,7 +10,7 @@ const LOSSY_FORMATS = [
   ['image/png', 'PNG'],
 ];
 
-export default function CompressTab() {
+export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [format, setFormat] = useState('image/jpeg');
@@ -35,6 +35,7 @@ export default function CompressTab() {
 
   const process = async () => {
     if (!file) return;
+    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     const engineLabel = engineInfo.type === 'vips' ? 'libvips' : 'Lanczos3';
     setStatus(`Compressing with ${engineLabel}…`);
@@ -47,6 +48,7 @@ export default function CompressTab() {
       const ext = FORMAT_MAP[format]?.ext || '.jpg';
       await saveFile(blob, baseName(file.name) + '_compressed' + ext);
       setStatus('Compressed ✓');
+      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

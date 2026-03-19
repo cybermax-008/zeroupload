@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { theme } from '../lib/theme';
 import { humanSize } from '../lib/fileUtils';
+import { STRIPE_CHECKOUT_URL } from '../lib/usageGate';
 
 // ══════════════════════════════════════════
 // DropZone — Drag & drop file input
@@ -342,6 +343,185 @@ export function EngineIndicator({ engineInfo }) {
       }}>
         {engineInfo.label} · {engineInfo.qualityLabel}
       </span>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// UsageCounter — Shows remaining free ops
+// ══════════════════════════════════════════
+export function UsageCounter({ usageInfo }) {
+  if (!usageInfo || usageInfo.isPro) return null;
+
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      padding: '3px 10px', borderRadius: 6,
+      background: usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim,
+      border: `1px solid ${usageInfo.remaining <= 1 ? 'rgba(201,90,90,0.2)' : 'rgba(201,165,90,0.2)'}`,
+    }}>
+      <span style={{
+        fontSize: 10, fontWeight: 500,
+        fontFamily: theme.fontMono,
+        color: usageInfo.remaining <= 1 ? theme.error : theme.accent,
+        letterSpacing: '0.04em',
+      }}>
+        {usageInfo.remaining}/{usageInfo.total} free today
+      </span>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// ProBadge — Shows pro status
+// ══════════════════════════════════════════
+export function ProBadge() {
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '3px 10px', borderRadius: 6,
+      background: 'rgba(201,165,90,0.15)',
+      border: '1px solid rgba(201,165,90,0.25)',
+    }}>
+      <span style={{
+        fontSize: 10, fontWeight: 700,
+        fontFamily: theme.fontMono,
+        color: theme.accent,
+        letterSpacing: '0.06em',
+      }}>
+        PRO
+      </span>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// PaywallModal — Shown when free limit hit
+// ══════════════════════════════════════════
+export function PaywallModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 20,
+        animation: 'fadeIn .2s ease',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: theme.surface,
+          border: `1px solid ${theme.border}`,
+          borderRadius: theme.radiusLg,
+          padding: '36px 32px',
+          maxWidth: 420,
+          width: '100%',
+          textAlign: 'center',
+          animation: 'slideUp .3s ease',
+        }}
+      >
+        <div style={{
+          fontSize: 36, marginBottom: 16, opacity: 0.8,
+        }}>
+          ◈
+        </div>
+
+        <h2 style={{
+          fontSize: 20, fontWeight: 700,
+          color: theme.text,
+          marginBottom: 8,
+        }}>
+          Daily limit reached
+        </h2>
+
+        <p style={{
+          fontSize: 13, color: theme.textMuted,
+          lineHeight: 1.6, marginBottom: 24,
+        }}>
+          You've used all 5 free operations for today.
+          Unlock unlimited access — forever.
+        </p>
+
+        <div style={{
+          background: theme.accentGlow,
+          border: `1px solid ${theme.accentDim}`,
+          borderRadius: theme.radius,
+          padding: '16px 20px',
+          marginBottom: 24,
+        }}>
+          <div style={{
+            fontSize: 32, fontWeight: 700,
+            color: theme.accent,
+            marginBottom: 4,
+          }}>
+            $6.99
+          </div>
+          <div style={{
+            fontSize: 12, color: theme.textMuted,
+            fontWeight: 500,
+          }}>
+            One-time payment · Lifetime access
+          </div>
+        </div>
+
+        <div style={{
+          textAlign: 'left', marginBottom: 24,
+          display: 'flex', flexDirection: 'column', gap: 8,
+        }}>
+          {['Unlimited operations, forever', 'All current & future tools', 'Support independent development'].map((text) => (
+            <div key={text} style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 13, color: theme.textMuted,
+            }}>
+              <span style={{ color: theme.success, fontSize: 14 }}>✓</span>
+              {text}
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => window.open(STRIPE_CHECKOUT_URL, '_blank')}
+          style={{
+            fontFamily: theme.font,
+            fontSize: 15, fontWeight: 700,
+            padding: '14px 32px',
+            borderRadius: 10,
+            border: 'none',
+            background: theme.accent,
+            color: theme.bg,
+            cursor: 'pointer',
+            width: '100%',
+            letterSpacing: '0.02em',
+            transition: theme.transition,
+          }}
+          onMouseEnter={(e) => e.target.style.background = theme.accentHover}
+          onMouseLeave={(e) => e.target.style.background = theme.accent}
+        >
+          Unlock Unlimited
+        </button>
+
+        <button
+          onClick={onClose}
+          style={{
+            fontFamily: theme.font,
+            fontSize: 12, fontWeight: 400,
+            color: theme.textDim,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            marginTop: 16,
+            padding: '4px 8px',
+            transition: theme.transitionFast,
+          }}
+          onMouseEnter={(e) => e.target.style.color = theme.textMuted}
+          onMouseLeave={(e) => e.target.style.color = theme.textDim}
+        >
+          Continue tomorrow for free
+        </button>
+      </div>
     </div>
   );
 }

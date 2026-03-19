@@ -6,7 +6,7 @@ import { DropZone, FileChip, Btn, Toggle, StatusBadge } from './ui';
 
 const FORMATS = Object.entries(FORMAT_MAP).map(([value, { label }]) => [value, label]);
 
-export default function ConvertTab() {
+export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [inputFormat, setInputFormat] = useState('');
@@ -36,6 +36,7 @@ export default function ConvertTab() {
 
   const process = async () => {
     if (!file) return;
+    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     const engineLabel = engineInfo.type === 'vips' ? 'libvips' : 'Canvas';
     setStatus(`Converting with ${engineLabel}…`);
@@ -47,6 +48,7 @@ export default function ConvertTab() {
       const ext = FORMAT_MAP[format]?.ext || '.png';
       await saveFile(blob, baseName(file.name) + ext);
       setStatus('Converted ✓');
+      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
