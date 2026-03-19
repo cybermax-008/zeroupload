@@ -1,47 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { theme, globalStyles } from './lib/theme';
 import { initEngine, getEngineInfo, destroyEngine } from './lib/imageEngine';
 import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo, getLicenseKey } from './lib/usageGate';
-import ResizeTab from './components/ResizeTab';
-import CompressTab from './components/CompressTab';
-import ConvertTab from './components/ConvertTab';
-import CropTab from './components/CropTab';
-import ImgToPdfTab from './components/ImgToPdfTab';
-import PdfToImageTab from './components/PdfToImageTab';
-import PdfToolsTab from './components/PdfToolsTab';
-import MetadataStripTab from './components/MetadataStripTab';
-import PdfPageOrganizerTab from './components/PdfPageOrganizerTab';
-import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, PricingSection, RestoreModal, LicenseKeyDisplay } from './components/ui';
-
-const TOOLS = [
-  {
-    section: 'Image Tools',
-    items: [
-      { id: 'resize',   icon: '⤡', label: 'Resize',          desc: 'Scale images to exact dimensions or presets' },
-      { id: 'compress', icon: '▼', label: 'Compress',        desc: 'Reduce file size with quality control' },
-      { id: 'convert',  icon: '⇄', label: 'Convert Format',  desc: 'PNG to JPG, WebP to PNG, and more' },
-      { id: 'crop',     icon: '⬒', label: 'Crop',            desc: 'Select and export a region of an image' },
-      { id: 'metadata', icon: '⊘', label: 'Strip Metadata',  desc: 'Remove GPS, device info, timestamps from images' },
-    ],
-  },
-  {
-    section: 'PDF Tools',
-    items: [
-      { id: 'img2pdf',  icon: '▤', label: 'Image → PDF',     desc: 'Combine images into a single PDF document' },
-      { id: 'pdf2img',  icon: '▥', label: 'PDF → Image',     desc: 'Convert PDF pages to JPEG or PNG' },
-      { id: 'pdfcompress', icon: '▼', label: 'Compress PDF', desc: 'Reduce PDF file size' },
-      { id: 'pdftools', icon: '⊞', label: 'PDF Toolkit',     desc: 'Merge, split, rotate, watermark, page numbers' },
-      { id: 'pdforganize', icon: '⊞', label: 'Organize Pages', desc: 'Reorder, delete, and insert PDF pages' },
-    ],
-  },
-];
-
-const TOOL_MAP = Object.fromEntries(
-  TOOLS.flatMap(s => s.items.map(t => [t.id, t]))
-);
+import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, RestoreModal, LicenseKeyDisplay } from './components/ui';
 
 export default function App() {
-  const [activeTool, setActiveTool] = useState(null);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
   const [mounted, setMounted] = useState(false);
   const [engineInfo, setEngineInfo] = useState(null);
   const [proUser, setProUser] = useState(isPro);
@@ -85,7 +51,10 @@ export default function App() {
     setUsageInfo(getUsageInfo());
   }, []);
 
-  const tool = TOOL_MAP[activeTool];
+  const handleShowPaywall = useCallback(() => {
+    setPaywallLimitReached(false);
+    setShowPaywall(true);
+  }, []);
 
   return (
     <div style={{
@@ -118,11 +87,12 @@ export default function App() {
             justifyContent: 'space-between', flexWrap: 'wrap',
             gap: 12,
           }}>
-            <div
-              onClick={() => setActiveTool(null)}
+            <Link
+              to="/"
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 cursor: 'pointer',
+                textDecoration: 'none',
               }}
             >
               <div style={{
@@ -132,7 +102,7 @@ export default function App() {
                 justifyContent: 'center',
                 fontSize: 18, color: theme.accent,
               }}>◈</div>
-              <h1 style={{
+              <span style={{
                 fontSize: 24, fontWeight: 700,
                 letterSpacing: '-0.03em',
                 background: `linear-gradient(135deg, ${theme.text} 0%, ${theme.accent} 100%)`,
@@ -140,13 +110,13 @@ export default function App() {
                 WebkitTextFillColor: 'transparent',
               }}>
                 Acorn Tools
-              </h1>
-            </div>
+              </span>
+            </Link>
 
-            {proUser ? <ProBadge /> : <UpgradeButton onClick={() => { setPaywallLimitReached(false); setShowPaywall(true); }} />}
+            {proUser ? <ProBadge /> : <UpgradeButton onClick={handleShowPaywall} />}
           </div>
 
-          {!activeTool && (
+          {isHome && (
             <p style={{
               fontSize: 14, color: theme.textMuted,
               fontWeight: 400, lineHeight: 1.5,
@@ -192,94 +162,13 @@ export default function App() {
           </div>
         </header>
 
-        {/* ── Tool picker (home) ── */}
-        {!activeTool && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {TOOLS.map((section) => (
-              <div key={section.section}>
-                <h2 style={{
-                  fontSize: 12, fontWeight: 600,
-                  color: theme.textMuted,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  marginBottom: 12,
-                }}>
-                  {section.section}
-                </h2>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-                  gap: 10,
-                }}>
-                  {section.items.map((t) => (
-                    <ToolCard key={t.id} tool={t} onClick={() => setActiveTool(t.id)} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Pricing section (home only, free users only) ── */}
-        {!activeTool && !proUser && (
-          <PricingSection onUpgrade={() => { setPaywallLimitReached(false); setShowPaywall(true); }} />
-        )}
-
-        {/* ── Active tool ── */}
-        {activeTool && (
-          <>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              marginBottom: 16,
-            }}>
-              <button
-                onClick={() => setActiveTool(null)}
-                style={{
-                  fontFamily: theme.font,
-                  fontSize: 12, fontWeight: 500,
-                  padding: '6px 14px',
-                  borderRadius: 6,
-                  border: `1px solid ${theme.border}`,
-                  background: 'transparent',
-                  color: theme.textMuted,
-                  cursor: 'pointer',
-                  transition: theme.transition,
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}
-              >
-                <span style={{ fontSize: 14 }}>←</span> All Tools
-              </button>
-              {tool && (
-                <span style={{
-                  fontSize: 14, fontWeight: 600,
-                  color: theme.text,
-                  display: 'flex', alignItems: 'center', gap: 8,
-                }}>
-                  <span style={{ color: theme.accent }}>{tool.icon}</span>
-                  {tool.label}
-                </span>
-              )}
-            </div>
-
-            <main style={{
-              background: theme.surface,
-              border: `1px solid ${theme.border}`,
-              borderRadius: theme.radiusLg,
-              padding: '28px 24px',
-            }}>
-              {activeTool === 'resize' && <ResizeTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'compress' && <CompressTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'convert' && <ConvertTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'crop' && <CropTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'img2pdf' && <ImgToPdfTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'pdf2img' && <PdfToImageTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'pdfcompress' && <PdfToolsTab defaultMode="compress" onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'pdftools' && <PdfToolsTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'metadata' && <MetadataStripTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-              {activeTool === 'pdforganize' && <PdfPageOrganizerTab onBeforeProcess={handleBeforeProcess} onOperationComplete={handleOperationComplete} />}
-            </main>
-          </>
-        )}
+        {/* ── Route content ── */}
+        <Outlet context={{
+          onBeforeProcess: handleBeforeProcess,
+          onOperationComplete: handleOperationComplete,
+          proUser,
+          onShowPaywall: handleShowPaywall,
+        }} />
 
         {showPaywall && (
           <PaywallModal limitReached={paywallLimitReached} onRestore={() => {
@@ -287,7 +176,6 @@ export default function App() {
             setShowRestore(true);
           }} onClose={() => {
             setShowPaywall(false);
-            // Re-check in case user completed payment in another tab
             if (isPro()) {
               setProUser(true);
               setUsageInfo(getUsageInfo());
@@ -390,49 +278,5 @@ export default function App() {
         </footer>
       </div>
     </div>
-  );
-}
-
-function ToolCard({ tool, onClick }) {
-  const [hover, setHover] = useState(false);
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        fontFamily: theme.font,
-        textAlign: 'left',
-        padding: '18px 16px',
-        borderRadius: theme.radius,
-        border: `1px solid ${hover ? theme.borderActive : theme.border}`,
-        background: hover ? theme.surfaceHover : theme.surface,
-        cursor: 'pointer',
-        transition: theme.transition,
-        display: 'flex', flexDirection: 'column', gap: 6,
-      }}
-    >
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-      }}>
-        <span style={{
-          fontSize: 18,
-          color: theme.accent,
-          lineHeight: 1,
-          width: 24, textAlign: 'center',
-        }}>{tool.icon}</span>
-        <span style={{
-          fontSize: 14, fontWeight: 600,
-          color: theme.text,
-        }}>{tool.label}</span>
-      </div>
-      <span style={{
-        fontSize: 12, fontWeight: 400,
-        color: theme.textMuted,
-        lineHeight: 1.4,
-        paddingLeft: 34,
-      }}>{tool.desc}</span>
-    </button>
   );
 }

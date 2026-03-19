@@ -12,6 +12,8 @@ export default defineConfig({
         // Cache wasm-vips binary, pica, pdf-lib for offline use
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB for wasm binaries
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             // Cache CDN resources (fonts, etc.)
