@@ -1,44 +1,111 @@
 /**
- * Acorn Tools Design System
+ * Acorn Tools Design System — Dark + Light mode via CSS custom properties
  */
 
-export const theme = {
+const darkColors = {
   bg:           '#0a0a0b',
   surface:      '#131316',
   surfaceHover: '#1a1a1f',
   surfaceAlt:   '#0f0f12',
   border:       '#1f1f26',
   borderActive: '#3d3d4a',
-
   text:         '#e8e6e3',
   textMuted:    '#6b6976',
   textDim:      '#3e3c47',
-
   accent:       '#c9a55a',
   accentDim:    'rgba(201,165,90,0.12)',
   accentGlow:   'rgba(201,165,90,0.06)',
   accentHover:  '#d4b366',
-
   success:      '#5ab87a',
   successDim:   'rgba(90,184,122,0.12)',
   error:        '#c95a5a',
   errorDim:     'rgba(201,90,90,0.12)',
-
-  radius:       10,
-  radiusLg:     14,
-
-  font:         "'Outfit', sans-serif",
-  fontMono:     "'JetBrains Mono', monospace",
-
-  // Shadows
+  overlay:      'rgba(0,0,0,0.75)',
   shadowSm:     '0 1px 2px rgba(0,0,0,0.3)',
   shadowMd:     '0 4px 12px rgba(0,0,0,0.4)',
   shadowLg:     '0 8px 32px rgba(0,0,0,0.5)',
+};
 
-  // Transitions
+const lightColors = {
+  bg:           '#f7f7f8',
+  surface:      '#ffffff',
+  surfaceHover: '#f0eff2',
+  surfaceAlt:   '#fafafa',
+  border:       '#dfdee3',
+  borderActive: '#c0bfc8',
+  text:         '#1a1a1d',
+  textMuted:    '#6b6976',
+  textDim:      '#b0adb8',
+  accent:       '#a8872e',
+  accentDim:    'rgba(168,135,46,0.12)',
+  accentGlow:   'rgba(168,135,46,0.06)',
+  accentHover:  '#c09e38',
+  success:      '#2d8a4e',
+  successDim:   'rgba(45,138,78,0.12)',
+  error:        '#c43c3c',
+  errorDim:     'rgba(196,60,60,0.10)',
+  overlay:      'rgba(0,0,0,0.45)',
+  shadowSm:     '0 1px 3px rgba(0,0,0,0.08)',
+  shadowMd:     '0 4px 12px rgba(0,0,0,0.10)',
+  shadowLg:     '0 8px 32px rgba(0,0,0,0.12)',
+};
+
+// Build CSS variable declarations from a color map
+function toVars(colors) {
+  return Object.entries(colors)
+    .map(([k, v]) => `--at-${k}: ${v};`)
+    .join('\n  ');
+}
+
+// Theme object references CSS variables — works in inline styles
+const colorKeys = Object.keys(darkColors);
+const themeColors = {};
+for (const k of colorKeys) {
+  themeColors[k] = `var(--at-${k})`;
+}
+
+export const theme = {
+  ...themeColors,
+
+  // Static tokens (same in both themes)
+  radius:       10,
+  radiusLg:     14,
+  font:         "'Outfit', sans-serif",
+  fontMono:     "'JetBrains Mono', monospace",
   transition:   'all 0.2s ease',
   transitionFast: 'all 0.15s ease',
 };
+
+// ── Theme switching ──
+
+const STORAGE_KEY = 'acorntools-theme';
+
+export function getStoredTheme() {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch { return null; }
+}
+
+export function applyTheme(mode) {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', mode);
+  try { localStorage.setItem(STORAGE_KEY, mode); } catch {}
+  // Update meta theme-color
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = mode === 'light' ? lightColors.bg : darkColors.bg;
+}
+
+export function getInitialTheme() {
+  const stored = getStoredTheme();
+  if (stored === 'light' || stored === 'dark') return stored;
+  // Respect OS preference
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: light)').matches) {
+    return 'light';
+  }
+  return 'dark';
+}
+
+// ── Global styles ──
 
 export const fonts = {
   url: 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
@@ -46,38 +113,44 @@ export const fonts = {
 
 export const globalStyles = `
   @import url('${fonts.url}');
-  
+
+  :root {
+    ${toVars(darkColors)}
+  }
+
+  [data-theme="light"] {
+    ${toVars(lightColors)}
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
+
   html {
-    /* Smooth scrolling */
     scroll-behavior: smooth;
-    /* Safe area insets for notched devices */
     --sat: env(safe-area-inset-top);
     --sab: env(safe-area-inset-bottom);
     --sal: env(safe-area-inset-left);
     --sar: env(safe-area-inset-right);
   }
 
-  body { 
-    background: ${theme.bg}; 
-    color: ${theme.text}; 
+  body {
+    background: var(--at-bg);
+    color: var(--at-text);
     font-family: ${theme.font};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
-    /* Prevent pull-to-refresh on mobile */
     overflow-y: auto;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { 
-    background: ${theme.border}; 
-    border-radius: 3px; 
+  ::-webkit-scrollbar-thumb {
+    background: var(--at-border);
+    border-radius: 3px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: ${theme.borderActive}; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--at-borderActive); }
 
   /* Number input spinners */
   input[type="number"]::-webkit-inner-spin-button,
@@ -92,7 +165,7 @@ export const globalStyles = `
     -webkit-appearance: none;
     appearance: none;
     height: 4px;
-    background: ${theme.border};
+    background: var(--at-border);
     border-radius: 2px;
     outline: none;
     cursor: pointer;
@@ -102,10 +175,10 @@ export const globalStyles = `
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: ${theme.accent};
+    background: var(--at-accent);
     cursor: pointer;
-    border: 2px solid ${theme.bg};
-    box-shadow: 0 0 8px rgba(201,165,90,0.3);
+    border: 2px solid var(--at-bg);
+    box-shadow: 0 0 8px var(--at-accentDim);
     transition: transform 0.15s ease;
   }
   input[type="range"]::-webkit-slider-thumb:hover {
@@ -115,14 +188,14 @@ export const globalStyles = `
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: ${theme.accent};
+    background: var(--at-accent);
     cursor: pointer;
-    border: 2px solid ${theme.bg};
+    border: 2px solid var(--at-bg);
   }
 
-  ::selection { 
-    background: ${theme.accentDim}; 
-    color: ${theme.accent}; 
+  ::selection {
+    background: var(--at-accentDim);
+    color: var(--at-accent);
   }
 
   @keyframes fadeUp {

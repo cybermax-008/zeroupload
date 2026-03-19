@@ -249,7 +249,7 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
               fontSize: 11, fontWeight: 500,
               padding: '6px 14px',
               borderRadius: 6,
-              border: `1px solid ${mode === m.id ? 'rgba(201,165,90,0.2)' : theme.border}`,
+              border: `1px solid ${mode === m.id ? theme.accentDim : theme.border}`,
               background: mode === m.id ? theme.accentDim : theme.surface,
               color: mode === m.id ? theme.accent : theme.textMuted,
               cursor: 'pointer',
@@ -395,7 +395,7 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '10px 14px', borderRadius: 8,
                   background: compressReduction > 0 ? theme.successDim : theme.errorDim,
-                  border: `1px solid ${compressReduction > 0 ? 'rgba(90,184,122,0.2)' : 'rgba(201,90,90,0.2)'}`,
+                  border: `1px solid ${compressReduction > 0 ? theme.successDim : theme.errorDim}`,
                 }}>
                   <span style={{ fontSize: 12, fontFamily: theme.fontMono, color: theme.textMuted }}>
                     {humanSize(inputSize)}

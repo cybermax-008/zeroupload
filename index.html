@@ -26,19 +26,30 @@
 
     <style>
       /* Critical CSS — prevents flash of unstyled content */
+      :root { --at-bg: #0a0a0b; --at-text: #e8e6e3; }
+      [data-theme="light"] { --at-bg: #f7f7f8; --at-text: #1a1a1d; }
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { 
-        background: #0a0a0b; 
-        color: #e8e6e3;
+      body {
+        background: var(--at-bg);
+        color: var(--at-text);
         font-family: system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
       #root {
         min-height: 100vh;
-        min-height: 100dvh; /* dynamic viewport height for mobile */
+        min-height: 100dvh;
       }
     </style>
+    <script>
+      // Apply theme before render to prevent flash
+      (function(){
+        var t = localStorage.getItem('acorntools-theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        if (t === 'light') document.querySelector('meta[name="theme-color"]').content = '#f7f7f8';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

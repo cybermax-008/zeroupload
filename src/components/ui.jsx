@@ -329,7 +329,7 @@ export function EngineIndicator({ engineInfo }) {
       display: 'inline-flex', alignItems: 'center', gap: 6,
       padding: '3px 10px', borderRadius: 6,
       background: engineInfo.type === 'vips' ? theme.successDim : theme.accentDim,
-      border: `1px solid ${engineInfo.type === 'vips' ? 'rgba(90,184,122,0.2)' : 'rgba(201,165,90,0.2)'}`,
+      border: `1px solid ${engineInfo.type === 'vips' ? theme.successDim : theme.accentDim}`,
     }}>
       <span style={{
         width: 5, height: 5, borderRadius: '50%',
@@ -358,7 +358,7 @@ export function UsageCounter({ usageInfo }) {
       display: 'inline-flex', alignItems: 'center', gap: 6,
       padding: '3px 10px', borderRadius: 6,
       background: usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim,
-      border: `1px solid ${usageInfo.remaining <= 1 ? 'rgba(201,90,90,0.2)' : 'rgba(201,165,90,0.2)'}`,
+      border: `1px solid ${usageInfo.remaining <= 1 ? theme.errorDim : theme.accentDim}`,
     }}>
       <span style={{
         fontSize: 10, fontWeight: 500,
@@ -380,8 +380,8 @@ export function ProBadge() {
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: 6,
       padding: '6px 14px', borderRadius: 20,
-      background: 'rgba(201,165,90,0.15)',
-      border: '1px solid rgba(201,165,90,0.25)',
+      background: theme.accentDim,
+      border: `1px solid ${theme.accentDim}`,
     }}>
       <span style={{
         color: theme.success, fontSize: 12, lineHeight: 1,
@@ -504,7 +504,7 @@ export function PricingSection({ onUpgrade }) {
         <div style={{
           padding: '24px 20px',
           borderRadius: theme.radius,
-          border: `1px solid rgba(201,165,90,0.3)`,
+          border: `1px solid ${theme.accentDim}`,
           background: theme.accentGlow,
           display: 'flex', flexDirection: 'column', gap: 16,
           position: 'relative',
@@ -598,7 +598,7 @@ export function PaywallModal({ onClose, limitReached, onRestore }) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.75)',
+        background: theme.overlay,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 20,
         animation: 'fadeIn .2s ease',
@@ -768,7 +768,7 @@ export function RestoreModal({ onClose, onRestored }) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
-        background: 'rgba(0,0,0,0.75)',
+        background: theme.overlay,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 20,
         animation: 'fadeIn .2s ease',
@@ -919,7 +919,7 @@ export function LicenseKeyDisplay({ licenseKey, onClose }) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
-        background: 'rgba(0,0,0,0.75)',
+        background: theme.overlay,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 20,
         animation: 'fadeIn .2s ease',

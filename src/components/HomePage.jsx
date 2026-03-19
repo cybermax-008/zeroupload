@@ -170,8 +170,8 @@ function PrivacyComparison() {
         <div style={{
           padding: '24px 20px',
           borderRadius: theme.radius,
-          border: `1px solid rgba(90,184,122,0.25)`,
-          background: 'rgba(90,184,122,0.04)',
+          border: `1px solid ${theme.successDim}`,
+          background: theme.successDim,
         }}>
           <div style={{
             fontSize: 13, fontWeight: 600,
@@ -268,9 +268,9 @@ function FlowDiagram({ steps, success }) {
               width: 1, height: 12,
               marginLeft: 12,
               background: step.highlight === 'error'
-                ? 'rgba(201,90,90,0.3)'
+                ? theme.errorDim
                 : success
-                  ? 'rgba(90,184,122,0.3)'
+                  ? theme.successDim
                   : theme.border,
             }} />
           )}

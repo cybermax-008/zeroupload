@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { theme, globalStyles } from './lib/theme';
+import { theme, globalStyles, getInitialTheme, applyTheme } from './lib/theme';
 import { initEngine, getEngineInfo, destroyEngine } from './lib/imageEngine';
 import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo, getLicenseKey } from './lib/usageGate';
 import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, RestoreModal, LicenseKeyDisplay } from './components/ui';
@@ -17,6 +17,15 @@ export default function App() {
   const [showLicenseKey, setShowLicenseKey] = useState(false);
   const [licenseKey, setLicenseKey] = useState('');
   const [usageInfo, setUsageInfo] = useState(getUsageInfo);
+  const [themeMode, setThemeMode] = useState(getInitialTheme);
+
+  useEffect(() => {
+    applyTheme(themeMode);
+  }, [themeMode]);
+
+  const toggleTheme = useCallback(() => {
+    setThemeMode(prev => prev === 'dark' ? 'light' : 'dark');
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -113,7 +122,10 @@ export default function App() {
               </span>
             </Link>
 
-            {proUser ? <ProBadge /> : <UpgradeButton onClick={handleShowPaywall} />}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <ThemeToggle mode={themeMode} onToggle={toggleTheme} />
+              {proUser ? <ProBadge /> : <UpgradeButton onClick={handleShowPaywall} />}
+            </div>
           </div>
 
           {isHome && (
@@ -329,5 +341,47 @@ export default function App() {
         </footer>
       </div>
     </div>
+  );
+}
+
+function ThemeToggle({ mode, onToggle }) {
+  const [hover, setHover] = useState(false);
+  const isLight = mode === 'light';
+
+  return (
+    <button
+      onClick={onToggle}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      aria-label={`Switch to ${isLight ? 'dark' : 'light'} mode`}
+      title={`Switch to ${isLight ? 'dark' : 'light'} mode`}
+      style={{
+        width: 34, height: 34,
+        borderRadius: 8,
+        border: `1px solid ${hover ? theme.borderActive : theme.border}`,
+        background: hover ? theme.surfaceHover : 'transparent',
+        color: theme.textMuted,
+        cursor: 'pointer',
+        transition: theme.transition,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 16,
+        padding: 0,
+        flexShrink: 0,
+      }}
+    >
+      {isLight ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      )}
+    </button>
   );
 }

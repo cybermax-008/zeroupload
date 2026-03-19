@@ -122,7 +122,7 @@ export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '8px 12px', borderRadius: 8,
                   background: theme.accentDim,
-                  border: `1px solid rgba(201,165,90,0.2)`,
+                  border: `1px solid ${theme.accentDim}`,
                 }}>
                   <span style={{ fontSize: 14 }}>!</span>
                   <span style={{ fontSize: 12, color: theme.accent }}>

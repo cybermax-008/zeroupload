@@ -157,7 +157,7 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
                   padding: '10px 14px',
                   borderRadius: 8,
                   background: reduction > 0 ? theme.successDim : theme.errorDim,
-                  border: `1px solid ${reduction > 0 ? 'rgba(90,184,122,0.2)' : 'rgba(201,90,90,0.2)'}`,
+                  border: `1px solid ${reduction > 0 ? theme.successDim : theme.errorDim}`,
                 }}>
                   <span style={{ fontSize: 12, fontFamily: theme.fontMono, color: theme.textMuted }}>
                     {humanSize(inputSize)}

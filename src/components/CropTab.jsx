@@ -229,22 +229,22 @@ export default function CropTab({ onBeforeProcess, onOperationComplete }) {
             <div style={{
               position: 'absolute', top: 0, left: 0,
               width: displayW, height: toDisplay(crop.y),
-              background: 'rgba(0,0,0,0.55)', pointerEvents: 'none',
+              background: theme.overlay, pointerEvents: 'none',
             }} />
             <div style={{
               position: 'absolute', top: toDisplay(crop.y + crop.h), left: 0,
               width: displayW, height: displayH - toDisplay(crop.y + crop.h),
-              background: 'rgba(0,0,0,0.55)', pointerEvents: 'none',
+              background: theme.overlay, pointerEvents: 'none',
             }} />
             <div style={{
               position: 'absolute', top: toDisplay(crop.y), left: 0,
               width: toDisplay(crop.x), height: toDisplay(crop.h),
-              background: 'rgba(0,0,0,0.55)', pointerEvents: 'none',
+              background: theme.overlay, pointerEvents: 'none',
             }} />
             <div style={{
               position: 'absolute', top: toDisplay(crop.y), left: toDisplay(crop.x + crop.w),
               width: displayW - toDisplay(crop.x + crop.w), height: toDisplay(crop.h),
-              background: 'rgba(0,0,0,0.55)', pointerEvents: 'none',
+              background: theme.overlay, pointerEvents: 'none',
             }} />
 
             {/* Crop border */}
