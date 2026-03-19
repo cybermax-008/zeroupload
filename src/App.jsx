@@ -46,6 +46,7 @@ export default function App() {
   const [engineInfo, setEngineInfo] = useState(null);
   const [proUser, setProUser] = useState(isPro);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallLimitReached, setPaywallLimitReached] = useState(false);
   const [usageInfo, setUsageInfo] = useState(getUsageInfo);
 
   useEffect(() => {
@@ -65,6 +66,7 @@ export default function App() {
 
   const handleBeforeProcess = useCallback(() => {
     if (canUseOperation()) return true;
+    setPaywallLimitReached(true);
     setShowPaywall(true);
     return false;
   }, []);
@@ -132,7 +134,7 @@ export default function App() {
               </h1>
             </div>
 
-            {proUser ? <ProBadge /> : <UpgradeButton onClick={() => setShowPaywall(true)} />}
+            {proUser ? <ProBadge /> : <UpgradeButton onClick={() => { setPaywallLimitReached(false); setShowPaywall(true); }} />}
           </div>
 
           {!activeTool && (
@@ -211,7 +213,7 @@ export default function App() {
 
         {/* ── Pricing section (home only, free users only) ── */}
         {!activeTool && !proUser && (
-          <PricingSection onUpgrade={() => setShowPaywall(true)} />
+          <PricingSection onUpgrade={() => { setPaywallLimitReached(false); setShowPaywall(true); }} />
         )}
 
         {/* ── Active tool ── */}
@@ -271,7 +273,7 @@ export default function App() {
         )}
 
         {showPaywall && (
-          <PaywallModal onClose={() => {
+          <PaywallModal limitReached={paywallLimitReached} onClose={() => {
             setShowPaywall(false);
             // Re-check in case user completed payment in another tab
             if (isPro()) {

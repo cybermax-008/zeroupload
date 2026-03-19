@@ -592,7 +592,7 @@ export function PricingSection({ onUpgrade }) {
 // ══════════════════════════════════════════
 // PaywallModal — Shown when free limit hit
 // ══════════════════════════════════════════
-export function PaywallModal({ onClose }) {
+export function PaywallModal({ onClose, limitReached }) {
   return (
     <div
       onClick={onClose}
@@ -628,15 +628,16 @@ export function PaywallModal({ onClose }) {
           color: theme.text,
           marginBottom: 8,
         }}>
-          Daily limit reached
+          {limitReached ? 'Daily limit reached' : 'Go Pro'}
         </h2>
 
         <p style={{
           fontSize: 13, color: theme.textMuted,
           lineHeight: 1.6, marginBottom: 24,
         }}>
-          You've used all 5 free operations for today.
-          Unlock unlimited access — forever.
+          {limitReached
+            ? "You've used all 5 free operations for today. Unlock unlimited access — forever."
+            : 'Get unlimited access to all tools — one payment, yours forever.'}
         </p>
 
         <div style={{
@@ -713,7 +714,7 @@ export function PaywallModal({ onClose }) {
           onMouseEnter={(e) => e.target.style.color = theme.textMuted}
           onMouseLeave={(e) => e.target.style.color = theme.textDim}
         >
-          Continue tomorrow for free
+          {limitReached ? 'Continue tomorrow for free' : 'Maybe later'}
         </button>
       </div>
     </div>
