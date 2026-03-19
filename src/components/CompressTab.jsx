@@ -91,6 +91,7 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
               border: `1px solid ${theme.border}`,
               display: 'flex', alignItems: 'center',
               justifyContent: 'center', background: theme.surfaceAlt,
+              alignSelf: 'flex-start',
             }}>
               <img src={preview} alt="" style={{
                 maxWidth: '100%', maxHeight: '100%', objectFit: 'contain',
@@ -99,7 +100,7 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
 
             {/* Controls */}
             <div style={{
-              flex: 1, minWidth: 280,
+              flex: 1, minWidth: 0,
               display: 'flex', flexDirection: 'column', gap: 14,
             }}>
               {/* Format */}

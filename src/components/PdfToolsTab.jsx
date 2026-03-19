@@ -18,6 +18,23 @@ const MODES = [
 
 const SINGLE_FILE_MODES = ['split', 'rotate', 'compress', 'watermark', 'pagenums'];
 
+function validatePageRange(input, totalPages) {
+  if (!input.trim()) return null; // empty = valid (means "all")
+  const parts = input.split(',').map(s => s.trim()).filter(Boolean);
+  for (const part of parts) {
+    const rangeMatch = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (rangeMatch) {
+      const [, a, b] = rangeMatch;
+      if (+a < 1 || +b > totalPages || +a > +b) return `Invalid range: ${part} (pages 1–${totalPages})`;
+    } else if (/^\d+$/.test(part)) {
+      if (+part < 1 || +part > totalPages) return `Page ${part} out of range (1–${totalPages})`;
+    } else {
+      return `Invalid: "${part}"`;
+    }
+  }
+  return null;
+}
+
 export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationComplete }) {
   const [mode, setMode] = useState(defaultMode || 'merge');
   const [files, setFiles] = useState([]);
@@ -96,6 +113,7 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
     setOutputSize(null);
     setInputSize(0);
     setCompressStats(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const doMerge = async () => {
@@ -286,71 +304,88 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
           </div>
 
           {/* Split range input */}
-          {mode === 'split' && pageCount > 0 && (
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              gap: 10, flexWrap: 'wrap',
-            }}>
-              <span style={{ color: theme.textMuted, fontSize: 12 }}>
-                Pages{' '}
-                <span style={{
-                  fontFamily: theme.fontMono,
-                  color: theme.accent,
-                }}>{pageCount}</span>{' '}
-                total
-              </span>
-              <input
-                type="text"
-                value={splitRange}
-                onChange={(e) => setSplitRange(e.target.value)}
-                placeholder="e.g. 1-3, 5, 8-10"
-                style={{ ...textInputStyle, width: 180 }}
-                onFocus={(e) => e.target.style.borderColor = theme.accent}
-                onBlur={(e) => e.target.style.borderColor = theme.border}
-              />
-              <span style={{ color: theme.textDim, fontSize: 11 }}>
-                Comma-separated ranges
-              </span>
-            </div>
-          )}
-
-          {/* Rotate controls */}
-          {mode === 'rotate' && (
-            <div style={{
-              display: 'flex', flexDirection: 'column', gap: 12,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ color: theme.textMuted, fontSize: 12, fontWeight: 500 }}>
-                  Rotation
-                </span>
-                <Toggle
-                  options={[[90, '90° CW'], [180, '180°'], [-90, '90° CCW']]}
-                  value={rotation} onChange={setRotation}
-                />
-              </div>
+          {mode === 'split' && pageCount > 0 && (() => {
+            const rangeError = validatePageRange(splitRange, pageCount);
+            return (
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+                display: 'flex', alignItems: 'center',
+                gap: 10, flexWrap: 'wrap',
               }}>
                 <span style={{ color: theme.textMuted, fontSize: 12 }}>
-                  Pages
-                  {pageCount > 0 && (
-                    <span style={{
-                      fontFamily: theme.fontMono, color: theme.accent, marginLeft: 4,
-                    }}>{pageCount} total</span>
-                  )}
+                  Pages{' '}
+                  <span style={{
+                    fontFamily: theme.fontMono,
+                    color: theme.accent,
+                  }}>{pageCount}</span>{' '}
+                  total
                 </span>
                 <input
                   type="text"
-                  value={rotateRange}
-                  onChange={(e) => setRotateRange(e.target.value)}
-                  placeholder="All pages (or e.g. 1-3, 5)"
-                  style={{ ...textInputStyle, width: 200 }}
-                  onFocus={(e) => e.target.style.borderColor = theme.accent}
-                  onBlur={(e) => e.target.style.borderColor = theme.border}
+                  value={splitRange}
+                  onChange={(e) => setSplitRange(e.target.value)}
+                  placeholder="e.g. 1-3, 5, 8-10"
+                  style={{
+                    ...textInputStyle, width: 180,
+                    borderColor: rangeError ? theme.error : undefined,
+                  }}
+                  onFocus={(e) => { if (!rangeError) e.target.style.borderColor = theme.accent; }}
+                  onBlur={(e) => { if (!rangeError) e.target.style.borderColor = theme.border; }}
                 />
+                {rangeError ? (
+                  <span style={{ color: theme.error, fontSize: 11 }}>{rangeError}</span>
+                ) : (
+                  <span style={{ color: theme.textDim, fontSize: 11 }}>Comma-separated ranges</span>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
+
+          {/* Rotate controls */}
+          {mode === 'rotate' && (() => {
+            const rotateError = pageCount > 0 ? validatePageRange(rotateRange, pageCount) : null;
+            return (
+              <div style={{
+                display: 'flex', flexDirection: 'column', gap: 12,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ color: theme.textMuted, fontSize: 12, fontWeight: 500 }}>
+                    Rotation
+                  </span>
+                  <Toggle
+                    options={[[90, '90° CW'], [180, '180°'], [-90, '90° CCW']]}
+                    value={rotation} onChange={setRotation}
+                  />
+                </div>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+                }}>
+                  <span style={{ color: theme.textMuted, fontSize: 12 }}>
+                    Pages
+                    {pageCount > 0 && (
+                      <span style={{
+                        fontFamily: theme.fontMono, color: theme.accent, marginLeft: 4,
+                      }}>{pageCount} total</span>
+                    )}
+                  </span>
+                  <input
+                    type="text"
+                    value={rotateRange}
+                    onChange={(e) => setRotateRange(e.target.value)}
+                    placeholder="All pages (or e.g. 1-3, 5)"
+                    style={{
+                      ...textInputStyle, width: 200,
+                      borderColor: rotateError ? theme.error : undefined,
+                    }}
+                    onFocus={(e) => { if (!rotateError) e.target.style.borderColor = theme.accent; }}
+                    onBlur={(e) => { if (!rotateError) e.target.style.borderColor = theme.border; }}
+                  />
+                  {rotateError && (
+                    <span style={{ color: theme.error, fontSize: 11 }}>{rotateError}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Compress controls */}
           {mode === 'compress' && (

@@ -120,6 +120,7 @@ export default function ResizeTab({ onBeforeProcess, onOperationComplete }) {
               border: `1px solid ${theme.border}`,
               display: 'flex', alignItems: 'center',
               justifyContent: 'center', background: theme.surfaceAlt,
+              alignSelf: 'flex-start',
             }}>
               <img
                 src={preview} alt=""
@@ -129,7 +130,7 @@ export default function ResizeTab({ onBeforeProcess, onOperationComplete }) {
 
             {/* Controls */}
             <div style={{
-              flex: 1, minWidth: 280,
+              flex: 1, minWidth: 0,
               display: 'flex', flexDirection: 'column', gap: 14,
             }}>
               {/* Presets */}

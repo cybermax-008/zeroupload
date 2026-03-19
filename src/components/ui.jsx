@@ -197,7 +197,7 @@ export function Btn({ children, onClick, disabled, secondary, small, style: extr
 // ══════════════════════════════════════════
 export function Toggle({ options, value, onChange }) {
   return (
-    <div style={{
+    <div role="radiogroup" style={{
       display: 'flex', gap: 2,
       background: theme.surface,
       borderRadius: 8, padding: 3,
@@ -206,11 +206,13 @@ export function Toggle({ options, value, onChange }) {
       {options.map(([v, l]) => (
         <button
           key={v}
+          role="radio"
+          aria-checked={value === v}
           onClick={() => onChange(v)}
           style={{
             fontFamily: theme.font,
             fontSize: 12, fontWeight: 500,
-            padding: '6px 16px',
+            padding: '8px 16px',
             borderRadius: 6, border: 'none',
             background: value === v ? theme.accentDim : 'transparent',
             color: value === v ? theme.accent : theme.textMuted,
