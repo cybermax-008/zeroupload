@@ -203,77 +203,128 @@ export default function App() {
 
         {/* ── Footer ── */}
         <footer style={{
-          textAlign: 'center', padding: '24px 0 0',
-          fontSize: 11, color: theme.textDim,
-          display: 'flex', flexDirection: 'column',
-          gap: 4, alignItems: 'center',
+          marginTop: 40,
+          borderTop: `1px solid ${theme.border}`,
+          padding: '32px 0 0',
         }}>
-          <span>
-            Powered by {engineInfo?.engine === 'vips' ? 'libvips' : 'Lanczos3'} resampling · pdf-lib · pdfjs · Web Workers
-          </span>
-          <span>Acorn Tools — No servers. No tracking. No cookies. Just your files.</span>
+          {/* Self-host callout */}
           <div style={{
+            background: theme.surface,
+            border: `1px solid ${theme.border}`,
+            borderRadius: theme.radius,
+            padding: '24px 20px',
+            marginBottom: 28,
             display: 'flex', alignItems: 'center', gap: 16,
-            marginTop: 4,
+            flexWrap: 'wrap',
           }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10,
+              background: theme.accentDim,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 20, flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 16 16" fill={theme.accent}>
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{
+                fontSize: 14, fontWeight: 600,
+                color: theme.text, marginBottom: 4,
+              }}>
+                100% open source — self-host or run locally
+              </div>
+              <div style={{
+                fontSize: 12, color: theme.textMuted,
+                lineHeight: 1.5,
+              }}>
+                Don't trust us? You don't have to. Clone the repo and run it yourself — <code style={{
+                  fontFamily: theme.fontMono, fontSize: 11,
+                  background: theme.accentDim, padding: '2px 6px',
+                  borderRadius: 4, color: theme.accent,
+                }}>npm install && npm run dev</code>
+              </div>
+            </div>
             <a
               href="https://github.com/cybermax-008/Acorn-tools"
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: theme.textMuted,
+                fontFamily: theme.font,
+                fontSize: 12, fontWeight: 600,
+                padding: '8px 16px',
+                borderRadius: 8,
+                border: `1px solid ${theme.border}`,
+                background: 'transparent',
+                color: theme.text,
                 textDecoration: 'none',
-                display: 'inline-flex', alignItems: 'center', gap: 5,
                 transition: theme.transition,
+                whiteSpace: 'nowrap',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
               }}
-              onMouseEnter={e => e.currentTarget.style.color = theme.accent}
-              onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = theme.accent; e.currentTarget.style.color = theme.accent; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = theme.border; e.currentTarget.style.color = theme.text; }}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
-              </svg>
-              Open Source on GitHub
+              View on GitHub
             </a>
-            <span style={{ color: theme.textDim }}>·</span>
-            <a
-              href="https://github.com/cybermax-008/Acorn-tools/issues/new?labels=feedback&title=Feedback:+&body=Tell+us+what+you+think!"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: theme.textMuted,
-                textDecoration: 'none',
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                transition: theme.transition,
-                fontSize: 11,
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = theme.accent}
-              onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              Send Feedback
-            </a>
-            {!proUser && (
-              <>
-                <span style={{ color: theme.textDim }}>·</span>
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); setShowRestore(true); }}
-                  style={{
-                    color: theme.textMuted,
-                    textDecoration: 'none',
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    transition: theme.transition,
-                    fontSize: 11,
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.color = theme.accent}
-                  onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
-                >
-                  Restore Purchase
-                </a>
-              </>
-            )}
+          </div>
+
+          {/* Bottom links */}
+          <div style={{
+            textAlign: 'center',
+            display: 'flex', flexDirection: 'column',
+            gap: 6, alignItems: 'center',
+          }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted }}>
+              Acorn Tools — No servers. No tracking. No cookies. Just your files.
+            </span>
+            <span style={{ fontSize: 11, color: theme.textDim }}>
+              Powered by {engineInfo?.engine === 'vips' ? 'libvips' : 'Lanczos3'} resampling · pdf-lib · pdfjs · Web Workers
+            </span>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 16,
+              marginTop: 6, flexWrap: 'wrap', justifyContent: 'center',
+            }}>
+              <a
+                href="https://github.com/cybermax-008/Acorn-tools/issues/new?labels=feedback&title=Feedback:+&body=Tell+us+what+you+think!"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: theme.textMuted,
+                  textDecoration: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  transition: theme.transition,
+                  fontSize: 11,
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = theme.accent}
+                onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Send Feedback
+              </a>
+              {!proUser && (
+                <>
+                  <span style={{ color: theme.textDim }}>·</span>
+                  <a
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); setShowRestore(true); }}
+                    style={{
+                      color: theme.textMuted,
+                      textDecoration: 'none',
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      transition: theme.transition,
+                      fontSize: 11,
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = theme.accent}
+                    onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+                  >
+                    Restore Purchase
+                  </a>
+                </>
+              )}
+            </div>
           </div>
         </footer>
       </div>
