@@ -481,7 +481,7 @@ export function PricingSection({ onUpgrade }) {
             display: 'flex', flexDirection: 'column', gap: 8,
           }}>
             {[
-              '5 operations per day',
+              '10 operations per day',
               'All tools included',
               '100% private processing',
             ].map((text) => (
@@ -643,7 +643,7 @@ export function PaywallModal({ onClose, limitReached, onRestore }) {
           lineHeight: 1.6, marginBottom: 24,
         }}>
           {limitReached
-            ? "You've used all 5 free operations for today. Unlock unlimited access — forever."
+            ? "You've used all 10 free operations for today. Unlock unlimited access — forever."
             : 'Get unlimited access to all tools — one payment, yours forever.'}
         </p>
 
