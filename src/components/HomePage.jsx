@@ -74,8 +74,11 @@ export default function HomePage() {
         ])}</script>
       </Helmet>
 
+      {/* ── Stats bar ── */}
+      <StatsBar />
+
       {/* ── Tool grid ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, marginTop: 32 }}>
         {TOOLS.map((section) => (
           <div key={section.section}>
             <h2 style={{
@@ -105,6 +108,9 @@ export default function HomePage() {
 
       {/* ── Trust signals ── */}
       <TrustSignals />
+
+      {/* ── Under the hood ── */}
+      <TechStack />
 
       {/* ── Pricing ── */}
       {!proUser && (
@@ -317,16 +323,22 @@ function TrustSignals() {
       icon: '⚖',
       title: 'Legal & Law Firms',
       text: 'Client contracts and court filings stay on your machine. No third-party data processing agreements needed.',
+      link: '/blog/confidential-legal-documents-without-breaking-ndas',
+      linkText: 'Read: NDA compliance guide',
     },
     {
       icon: '🏥',
       title: 'Healthcare',
       text: 'Process documents with PHI without uploading to external servers. Supports HIPAA compliance requirements.',
+      link: '/blog/hipaa-compliant-pdf-tools-browser-based',
+      linkText: 'Read: HIPAA compliance guide',
     },
     {
       icon: '🏦',
       title: 'Finance & Banking',
       text: 'Handle sensitive financial documents locally. No risk of data exposure through third-party services.',
+      link: '/blog/sox-compliance-document-processing-local',
+      linkText: 'Read: SOX compliance guide',
     },
   ];
 
@@ -366,7 +378,150 @@ function TrustSignals() {
             <div style={{
               fontSize: 12, color: theme.textMuted,
               lineHeight: 1.5,
+              marginBottom: 8,
             }}>{s.text}</div>
+            <Link
+              to={s.link}
+              style={{
+                fontSize: 11, fontWeight: 500,
+                color: theme.accent,
+                textDecoration: 'none',
+                transition: theme.transition,
+              }}
+            >
+              {s.linkText} →
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// StatsBar — Quick-scan credibility numbers
+// ══════════════════════════════════════════
+function StatsBar() {
+  const stats = [
+    { value: '15', label: 'Tools', sub: 'PDF & Image' },
+    { value: '0', label: 'Bytes uploaded', sub: 'Ever' },
+    { value: '100%', label: 'Open source', sub: 'MIT License' },
+    { value: '0', label: 'Sign-ups required', sub: 'No account needed' },
+  ];
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gap: 10,
+    }}>
+      {stats.map((s) => (
+        <div key={s.label} style={{
+          padding: '16px 14px',
+          borderRadius: theme.radius,
+          border: `1px solid ${theme.border}`,
+          background: theme.surface,
+          textAlign: 'center',
+        }}>
+          <div style={{
+            fontSize: 24, fontWeight: 700,
+            color: theme.accent,
+            fontFamily: theme.fontMono,
+            lineHeight: 1.2,
+          }}>
+            {s.value}
+          </div>
+          <div style={{
+            fontSize: 12, fontWeight: 600,
+            color: theme.text,
+            marginTop: 4,
+          }}>
+            {s.label}
+          </div>
+          <div style={{
+            fontSize: 10, color: theme.textDim,
+            marginTop: 2,
+          }}>
+            {s.sub}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// TechStack — Under the hood (for HN crowd)
+// ══════════════════════════════════════════
+function TechStack() {
+  const techs = [
+    {
+      name: 'libvips (WASM)',
+      desc: 'The same image processing library used by Sharp and Cloudinary, compiled to WebAssembly. Runs natively in the browser at near-native speed.',
+    },
+    {
+      name: 'pdf-lib',
+      desc: 'Pure JavaScript PDF manipulation. Merge, split, rotate, watermark, and add page numbers without any server dependency.',
+    },
+    {
+      name: 'pdfjs-dist',
+      desc: 'Mozilla\'s PDF renderer for accurate page rendering, thumbnail generation, and PDF-to-image conversion.',
+    },
+    {
+      name: 'MozJPEG + SSIM',
+      desc: 'Smart PDF compression uses perceptual quality measurement (SSIM) to find the optimal compression level for each embedded image.',
+    },
+  ];
+
+  return (
+    <div style={{ marginTop: 36 }}>
+      <h2 style={{
+        fontSize: 12, fontWeight: 600,
+        color: theme.textMuted,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        marginBottom: 6,
+        textAlign: 'center',
+      }}>
+        Under the hood
+      </h2>
+      <p style={{
+        fontSize: 13, color: theme.textMuted,
+        textAlign: 'center',
+        lineHeight: 1.5,
+        marginBottom: 16,
+        maxWidth: 480,
+        margin: '0 auto 16px',
+      }}>
+        Production-grade libraries compiled to WebAssembly, running entirely in your browser tab.
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: 10,
+      }}>
+        {techs.map((t) => (
+          <div key={t.name} style={{
+            padding: '16px',
+            borderRadius: theme.radius,
+            border: `1px solid ${theme.border}`,
+            background: theme.surface,
+          }}>
+            <div style={{
+              fontSize: 13, fontWeight: 600,
+              color: theme.text,
+              marginBottom: 4,
+              fontFamily: theme.fontMono,
+            }}>
+              {t.name}
+            </div>
+            <div style={{
+              fontSize: 12, color: theme.textMuted,
+              lineHeight: 1.5,
+            }}>
+              {t.desc}
+            </div>
           </div>
         ))}
       </div>
