@@ -11,6 +11,7 @@ import PdfToImageTab from './PdfToImageTab';
 import PdfToolsTab from './PdfToolsTab';
 import MetadataStripTab from './MetadataStripTab';
 import PdfPageOrganizerTab from './PdfPageOrganizerTab';
+import PdfRedactTab from './PdfRedactTab';
 
 const TOOL_COMPONENTS = {
   resize: ResizeTab,
@@ -23,6 +24,7 @@ const TOOL_COMPONENTS = {
   pdftools: PdfToolsTab,
   metadata: MetadataStripTab,
   pdforganize: PdfPageOrganizerTab,
+  pdfredact: PdfRedactTab,
 };
 
 export default function ToolPage({ routeKey }) {

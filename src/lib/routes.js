@@ -148,6 +148,16 @@ const ROUTES = [
     defaultMode: 'pagenums',
   },
   {
+    path: '/redact-pdf',
+    toolId: 'pdfredact',
+    icon: '█',
+    label: 'Redact PDF',
+    title: 'Redact PDF Online Free — Acorn Tools',
+    description: 'Permanently redact sensitive content from PDFs. Draw over text, images, or any area to remove it. 100% private — nothing is uploaded.',
+    h1: 'Redact PDF — Free & Private',
+    seoContent: 'Permanently remove sensitive information from PDF documents. Draw rectangles over text, images, or any content to redact it. True redaction — the original content is destroyed, not just covered. All processing runs locally in your browser.',
+  },
+  {
     path: '/pdf-pages',
     toolId: 'pdforganize',
     icon: '⊞',

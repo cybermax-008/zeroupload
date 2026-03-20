@@ -27,6 +27,7 @@ const TOOLS = [
       { path: '/rotate-pdf',        icon: '↻', label: 'Rotate PDF',        desc: 'Rotate pages 90°, 180°, or 270°' },
       { path: '/watermark-pdf',     icon: '◈', label: 'Watermark PDF',     desc: 'Add text watermarks to PDF documents' },
       { path: '/pdf-page-numbers',  icon: '#', label: 'Page Numbers',      desc: 'Add page numbers to PDF documents' },
+      { path: '/redact-pdf',        icon: '█', label: 'Redact PDF',        desc: 'Permanently remove sensitive content' },
       { path: '/pdf-pages',         icon: '⊞', label: 'Organize Pages',    desc: 'Reorder, delete, and insert PDF pages' },
     ],
   },
