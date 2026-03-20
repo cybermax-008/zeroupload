@@ -194,6 +194,140 @@ const BLOG_POSTS = [
       },
     ],
   },
+  {
+    slug: 'confidential-legal-documents-without-breaking-ndas',
+    title: 'Handling Confidential Legal Documents Online Without Breaking NDAs',
+    metaTitle: 'Handling Confidential Legal Documents Online Without Breaking NDAs — Acorn Tools',
+    description: 'Why uploading client files to online PDF tools may breach your NDA and confidentiality obligations — and how browser-based processing avoids the risk entirely.',
+    date: '2026-03-19',
+    readTime: '7 min read',
+    category: 'Legal & Confidentiality',
+    ctas: [
+      { label: 'Redact PDF', path: '/redact-pdf', icon: '█' },
+      { label: 'Merge PDFs', path: '/merge-pdf', icon: '⊕' },
+      { label: 'Strip Metadata', path: '/strip-metadata', icon: '⊘' },
+    ],
+    sections: [
+      {
+        heading: 'The confidentiality problem hiding in your workflow',
+        paragraphs: [
+          'Every law firm, in-house legal department, and solo practitioner handles documents bound by confidentiality obligations. Client contracts, settlement agreements, court filings, due diligence materials, IP documentation — these all carry an implicit or explicit duty of confidentiality. Yet the tools used to process these documents often undermine that duty without anyone noticing.',
+          'When a paralegal merges two PDFs using an online tool, or an associate compresses a filing before upload to a court portal, the document is typically sent to a third-party server for processing. This transmission — even if brief and encrypted — constitutes disclosure to a third party. And in many cases, that disclosure violates the confidentiality obligations attached to the document.',
+          'The risk isn\'t theoretical. Bar associations have issued ethics opinions on cloud storage and third-party document processing. The ABA\'s Model Rule 1.6 requires lawyers to make "reasonable efforts to prevent the inadvertent or unauthorized disclosure" of client information. Uploading client documents to an unvetted online tool is difficult to characterize as a reasonable effort.',
+        ],
+      },
+      {
+        heading: 'What NDAs actually prohibit',
+        paragraphs: [
+          'Most NDAs define "confidential information" broadly — typically any information disclosed in connection with a business relationship, excluding information that becomes publicly available or was independently known. Documents exchanged under NDA almost certainly qualify as confidential information under these standard definitions.',
+          'NDAs typically restrict disclosure to third parties without prior written consent. When you upload a document to an online tool, the tool operator receives and processes the document. Even if they don\'t read it, even if they delete it immediately, the transmission itself may constitute unauthorized disclosure. Many NDAs don\'t distinguish between intentional sharing and incidental processing — disclosure is disclosure.',
+          'Mutual NDAs compound the problem. In M&A due diligence, for example, both parties exchange sensitive financials, customer lists, and IP documentation under strict confidentiality. If either party\'s staff uses an online tool to process these documents, they may breach the NDA — potentially jeopardizing the deal or creating liability.',
+          'Some NDAs include specific provisions about data handling, requiring that confidential information be processed only on approved systems or within certain jurisdictions. Online tools with servers in unknown or multiple locations make compliance with these provisions impossible to verify.',
+        ],
+      },
+      {
+        heading: 'Attorney-client privilege at risk',
+        paragraphs: [
+          'Beyond NDAs, attorney-client privilege adds another layer of concern. Privileged communications — including draft briefs, legal memoranda, strategy documents, and attorney work product — lose their protected status if disclosed to third parties outside the privilege.',
+          'Courts have held that privilege can be waived by voluntary disclosure to third parties, even when unintentional. While most jurisdictions apply a "reasonable precautions" test rather than strict liability for inadvertent disclosure, routinely uploading privileged documents to online tools undermines the argument that reasonable precautions were taken.',
+          'The risk is particularly acute for litigation documents. Work product shared during discovery preparation, deposition summaries, and case strategy memos are exactly the types of documents that might need merging, redacting, or compressing. If opposing counsel discovers that these documents were processed through a third-party online tool, they may challenge the privilege claim.',
+        ],
+      },
+      {
+        heading: 'How browser-based tools preserve confidentiality',
+        paragraphs: [
+          'Browser-based document tools eliminate the third-party disclosure problem entirely. When a PDF is merged, redacted, compressed, or converted in the browser, the document never leaves the user\'s device. There\'s no upload, no server-side processing, no temporary storage on external infrastructure.',
+          'From a confidentiality analysis, browser-based processing is equivalent to using desktop software installed on your workstation. The tool\'s code runs locally, the document stays local, and the result is saved locally. The tool vendor serves the application code (HTML, JavaScript) but never has access to the documents being processed.',
+          'This means no NDA breach from document transmission, no privilege waiver risk from third-party disclosure, no need to vet the tool vendor\'s security posture or data retention policies, and no conflict with jurisdictional restrictions in NDAs. The simplest way to maintain confidentiality is to ensure the confidential information never leaves your control.',
+        ],
+      },
+      {
+        heading: 'Common legal workflows that create exposure',
+        paragraphs: [
+          'Document redaction is arguably the highest-risk operation in legal practice. Redacting a document before production means the original contains information that must not be disclosed — exactly the type of content that should never touch a third-party server. True redaction permanently removes the underlying content, and doing it client-side ensures the unredacted version exists only on the attorney\'s device.',
+          'Merging exhibits, declarations, and supporting documents into a single filing is a daily task in litigation. Each component may contain confidential or privileged information, and the merged result contains all of it. Processing through an online tool exposes every document in the merge.',
+          'Metadata stripping before document production is a professional obligation in many jurisdictions. PDF and image metadata can contain revision history, author names, comments, and tracked changes — information that may reveal attorney work product or confidential client communications. Stripping metadata locally prevents this information from being transmitted to any third party.',
+          'Compressing documents before filing with courts or sharing with co-counsel seems routine, but if those documents contain confidential information, the compression should happen locally. Many court e-filing systems have file size limits, making compression a necessary step that shouldn\'t introduce confidentiality risk.',
+        ],
+      },
+      {
+        heading: 'Building a compliant document workflow',
+        paragraphs: [
+          'The solution is straightforward: replace server-dependent online tools with browser-based alternatives for any document that carries confidentiality obligations. This doesn\'t require changing your workflow — the user experience is identical (drag, process, download) — it just changes where the processing happens.',
+          'For firms with formal information security policies, browser-based tools simplify the vendor assessment process. There\'s no data processing to evaluate because no data is processed by the vendor. There\'s no security questionnaire to complete, no SOC 2 report to review, and no data breach notification obligation from the tool provider.',
+          'Consider making browser-based tools the default for all document processing, not just confidential documents. This eliminates the risk of staff misjudging whether a document is confidential and using the wrong tool. When every document is processed locally, confidentiality is maintained by default rather than by judgment call.',
+          'For firms that want maximum assurance, open-source browser-based tools can be self-hosted behind the firm\'s firewall. The static application files are served from internal infrastructure, and staff access the tools through the firm\'s intranet. Processing still happens entirely in the browser — self-hosting just adds control over the application distribution.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'sox-compliance-document-processing-local',
+    title: 'SOX Compliance and Document Processing: Why Local Matters',
+    metaTitle: 'SOX Compliance and Document Processing: Why Local Matters — Acorn Tools',
+    description: 'How browser-based file tools help finance teams maintain SOX compliance by keeping sensitive financial documents off third-party servers.',
+    date: '2026-03-19',
+    readTime: '7 min read',
+    category: 'Finance & Compliance',
+    ctas: [
+      { label: 'Compress PDF', path: '/compress-pdf', icon: '▼' },
+      { label: 'Redact PDF', path: '/redact-pdf', icon: '█' },
+      { label: 'Merge PDFs', path: '/merge-pdf', icon: '⊕' },
+    ],
+    sections: [
+      {
+        heading: 'Financial documents and the third-party tool problem',
+        paragraphs: [
+          'Finance teams, auditors, and banking professionals work with some of the most sensitive documents in any organization: quarterly earnings drafts, audit workpapers, M&A term sheets, loan applications, customer financial statements, board presentations, and internal forecasts. These documents move through countless processing steps — merging, compressing, redacting, converting — before reaching their final destination.',
+          'When any of these steps involves an online tool that uploads documents to a server, the organization loses control over where that financial data exists. For publicly traded companies subject to SOX (Sarbanes-Oxley Act), this loss of control creates compliance exposure that extends far beyond data privacy.',
+          'The stakes are high. SOX violations can result in criminal penalties for executives, including fines up to $5 million and imprisonment up to 20 years for willful violations. Even unintentional compliance failures can trigger costly remediation, restatements, and reputational damage.',
+        ],
+      },
+      {
+        heading: 'SOX Section 302 and document integrity',
+        paragraphs: [
+          'Section 302 of SOX requires CEOs and CFOs to personally certify the accuracy of financial reports and the effectiveness of internal controls over financial reporting. This certification extends to the processes and systems that handle financial data — including the tools used to process financial documents.',
+          'When financial documents are uploaded to third-party online tools, a gap is introduced in the chain of custody. The document leaves the organization\'s controlled environment, is processed on infrastructure the organization doesn\'t manage, and returns. During that window, the organization cannot certify what happened to the data — whether it was logged, cached, modified, or accessed by unauthorized parties.',
+          'Internal controls are only as strong as their weakest link. If the finance team uses vetted, controlled systems for accounting and reporting but processes supporting documents through unvetted online tools, the control environment has a gap that auditors can identify and that management must address.',
+        ],
+      },
+      {
+        heading: 'Section 404 internal controls and IT general controls',
+        paragraphs: [
+          'Section 404 requires management to assess the effectiveness of internal controls over financial reporting annually, with external auditor attestation for accelerated filers. IT General Controls (ITGCs) are a critical component of this assessment, covering access management, change management, and IT operations for systems that process financial data.',
+          'Every third-party tool that handles financial documents potentially falls within the scope of ITGC testing. If an online PDF tool processes documents containing financial data, auditors may ask: What access controls does the tool have? What is its change management process? How are operations monitored? What is the data retention policy? For free online tools, the answers to these questions are typically unavailable or unsatisfactory.',
+          'Browser-based tools fall outside ITGC scope because they never access financial data. The tool vendor serves static application code, but the financial documents are processed entirely within the user\'s browser on the organization\'s workstation. The relevant ITGCs are those already in place for the workstation itself — access controls, patching, endpoint protection — not new controls for an additional vendor.',
+          'This distinction significantly reduces the scope of ITGC testing. Each third-party tool that processes financial data adds to the audit scope, requiring vendor assessments, control testing, and documentation. Eliminating these tools from the scope saves time and cost during the annual SOX compliance cycle.',
+        ],
+      },
+      {
+        heading: 'Material non-public information (MNPI)',
+        paragraphs: [
+          'Public companies handle material non-public information regularly — draft earnings releases, M&A discussions, strategic plans, board materials, and financial forecasts. SEC regulations and insider trading laws impose strict obligations on how MNPI is handled. Unauthorized disclosure of MNPI can trigger SEC enforcement actions and private litigation.',
+          'When a document containing MNPI is uploaded to an online tool, it\'s transmitted to and processed by a third party. Even if the tool operator doesn\'t intentionally access the content, the transmission creates a record that could be subpoenaed, the data may exist in logs or backups, and the tool\'s employees have theoretical access to the processing infrastructure.',
+          'For organizations with robust MNPI policies, the use of online tools for document processing should be a red flag. Most MNPI policies restrict information sharing to authorized individuals and approved systems. Free online tools are unlikely to qualify as approved systems, and their operators are not authorized recipients.',
+          'Browser-based processing eliminates MNPI exposure from document processing. The information never leaves the authorized user\'s device, never exists on third-party infrastructure, and never creates records accessible to unauthorized parties. This aligns with the principle of limiting MNPI dissemination to the minimum necessary.',
+        ],
+      },
+      {
+        heading: 'Audit trail and chain of custody',
+        paragraphs: [
+          'Financial document processing requires a defensible chain of custody. When auditors ask how a document was prepared — how exhibits were merged, how sensitive information was redacted, how files were compressed for submission — the answer should demonstrate controlled, documented processes.',
+          'Online tools break this chain. The document leaves the organization\'s environment, is processed in an unknown location, and returns. There\'s typically no audit log from the tool, no verification of processing integrity, and no evidence of what data was retained. If questions arise about document integrity months or years later, the organization cannot demonstrate what happened during the online processing step.',
+          'Browser-based processing keeps the entire chain of custody local. The document is processed within the organization\'s controlled environment, on a device subject to the organization\'s access controls and logging policies. The processing is equivalent to using installed desktop software — it inherits the existing control environment rather than introducing a new, uncontrolled link.',
+        ],
+      },
+      {
+        heading: 'Practical recommendations for finance teams',
+        paragraphs: [
+          'Start with a tool inventory. Identify all online tools that finance staff use for document processing. This often reveals a surprising number of shadow IT tools — free online services that individuals discovered through search and adopted without IT or compliance review. Each one represents potential SOX scope and MNPI exposure.',
+          'Replace server-dependent tools with browser-based alternatives. For the common operations finance teams need — compressing PDFs for filing, merging supporting documents, redacting sensitive information before sharing, converting formats, and stripping metadata — browser-based tools provide equivalent functionality without the compliance overhead.',
+          'Update your IT and information security policies to specify approved document processing tools. Explicitly note that browser-based tools that process documents locally are preferred over server-dependent alternatives. This provides clear guidance to staff and demonstrates proactive compliance effort to auditors.',
+          'For organizations with strict IT governance, consider self-hosting browser-based tools on internal infrastructure. Deploy the static application files behind your corporate authentication, and staff access the tools through the intranet. Processing still happens in the browser — self-hosting just ensures the application itself is distributed under your control.',
+        ],
+      },
+    ],
+  },
 ];
 
 // Build lookup map
