@@ -60,7 +60,7 @@ All styling is inline React style objects — no CSS files or class names. Desig
 
 ### Usage Gate & Monetization
 
-`src/lib/usageGate.js` — client-side usage tracking with localStorage. Free users get 5 operations/day; Pro users get unlimited. Gate checks happen at processing time via `onBeforeProcess`/`onOperationComplete` callbacks passed from `App.jsx` to all tool tabs.
+`src/lib/usageGate.js` — client-side usage tracking with localStorage. Free users get 10 operations/day; Pro users get unlimited. Gate checks happen at processing time via `onBeforeProcess`/`onOperationComplete` callbacks passed from `App.jsx` to all tool tabs.
 
 - **Stripe Payment Link** for $6.99 one-time purchase. URL hardcoded in `usageGate.js`.
 - **License key** = Stripe Checkout Session ID. Shown after payment, verifiable via `/api/verify-license`.
@@ -69,9 +69,21 @@ All styling is inline React style objects — no CSS files or class names. Desig
 
 `api/verify-license.js` — Vercel serverless function that validates license keys against Stripe API. Requires `STRIPE_SECRET_KEY` env var.
 
+### Batch Processing
+
+`src/lib/useBatch.js` — Pro-only multi-file processing for CompressTab, ConvertTab, MetadataStripTab. Uses `itemsRef` (not state) for the processing loop snapshot — React 18 batching makes `setState` updaters unreliable for synchronous reads in async functions. Each tab has three render paths: empty (DropZone), single-file (original UX unchanged), batch (2+ files). Free users who drop multiple files get the first file in single-file mode + paywall.
+
+### Blog System
+
+`src/lib/blogPosts.js` — Data registry for blog articles (slug, metadata, sections, CTAs). `src/components/BlogIndexPage.jsx` renders the blog index at `/blog`. `src/components/BlogArticlePage.jsx` renders individual articles at `/blog/:slug` with JSON-LD structured data, related posts, and tool CTAs. Blog routes are defined in `main.jsx`, not in `routes.js`.
+
+### SEO & Structured Data
+
+All pages include JSON-LD structured data via `react-helmet-async`. Tool pages have `SoftwareApplication` + `FAQPage` + `BreadcrumbList` schemas. Blog articles have `Article` + `BreadcrumbList`. Homepage has `WebApplication` + `Organization`. Tool pages render collapsible FAQ sections from `faqs` arrays in `routes.js`.
+
 ### Component Structure
 
-Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. `onBeforeProcess`/`onOperationComplete` callbacks are passed via React Router's outlet context. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, `PaywallModal`, `RestoreModal`, etc.) live in `src/components/ui.jsx` with no domain logic.
+Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. `onBeforeProcess`/`onOperationComplete` callbacks are passed via React Router's outlet context. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, `BatchFileList`, `BatchProgress`, `PaywallModal`, `RestoreModal`, etc.) live in `src/components/ui.jsx` with no domain logic.
 
 ## Deployment
 
