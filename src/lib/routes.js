@@ -10,6 +10,12 @@ const ROUTES = [
     description: 'Resize images to exact dimensions or presets. 100% private — your files never leave your device. Supports JPEG, PNG, WebP, AVIF.',
     h1: 'Resize Images Online — Free & Private',
     seoContent: 'Scale images to exact pixel dimensions, percentages, or common presets. All processing happens in your browser — nothing is uploaded to any server. Supports JPEG, PNG, WebP, and AVIF formats.',
+    faqs: [
+      { q: 'Is my image uploaded to a server when I resize it?', a: 'No. All resizing happens directly in your browser using WebAssembly. Your image never leaves your device — there is zero network upload during processing.' },
+      { q: 'What image formats can I resize?', a: 'Acorn Tools supports JPEG, PNG, WebP, and AVIF. You can resize any of these formats while keeping the original format or converting to another.' },
+      { q: 'Can I resize images to exact pixel dimensions?', a: 'Yes. You can enter exact width and height in pixels, resize by percentage, or choose from common presets like social media sizes. Aspect ratio can be locked or unlocked.' },
+      { q: 'Does resizing reduce image quality?', a: 'Acorn Tools uses Lanczos3 resampling (via libvips or Pica.js), which is the same high-quality algorithm used by professional image editors. Quality loss is minimal and you can control the output quality setting.' },
+    ],
   },
   {
     path: '/compress-image',
@@ -20,6 +26,12 @@ const ROUTES = [
     description: 'Reduce image file size with quality control. 100% private — your files never leave your device. Supports JPEG, PNG, WebP.',
     h1: 'Compress Images Online — Free & Private',
     seoContent: 'Reduce image file sizes with adjustable quality control. See before/after comparisons in real time. All compression happens locally in your browser — your images are never uploaded anywhere.',
+    faqs: [
+      { q: 'How much can I reduce my image file size?', a: 'Typical compression reduces file size by 50–80% depending on the image content and quality setting. You can adjust the quality slider and see the resulting file size in real time before downloading.' },
+      { q: 'Is my image uploaded to any server during compression?', a: 'No. Compression runs entirely in your browser using WebAssembly. Your images never leave your device — you can even disconnect from the internet and it will still work.' },
+      { q: 'Will compression make my image look blurry?', a: 'You have full control over the quality setting. The tool shows a real-time before/after comparison so you can find the right balance between file size and visual quality before saving.' },
+      { q: 'What image formats can I compress?', a: 'You can compress JPEG, PNG, and WebP images. The tool uses libvips (compiled to WebAssembly) for high-quality compression — the same library used by major image processing platforms.' },
+    ],
   },
   {
     path: '/convert-image',
@@ -30,6 +42,12 @@ const ROUTES = [
     description: 'Convert between PNG, JPG, WebP, AVIF and more. 100% private — your files never leave your device.',
     h1: 'Convert Image Format — Free & Private',
     seoContent: 'Convert images between formats: PNG to JPG, WebP to PNG, AVIF to JPEG, and more. All conversion happens in your browser — no upload, no server, no tracking.',
+    faqs: [
+      { q: 'What image formats can I convert between?', a: 'You can convert between JPEG, PNG, WebP, and AVIF formats. Common conversions include PNG to JPG, WebP to PNG, AVIF to JPEG, and JPG to WebP.' },
+      { q: 'Does converting formats reduce image quality?', a: 'Converting to lossy formats (JPEG, WebP) involves some quality trade-off, but you can control the quality setting. Converting to lossless formats (PNG) preserves full quality.' },
+      { q: 'Are my images uploaded during conversion?', a: 'No. All format conversion happens locally in your browser. Your images never leave your device, making it safe for sensitive or private photos.' },
+      { q: 'Can I convert multiple images at once?', a: 'Yes. Pro users can batch-convert multiple images simultaneously. Drop multiple files and they will all be converted to your chosen format.' },
+    ],
   },
   {
     path: '/crop-image',
@@ -40,6 +58,11 @@ const ROUTES = [
     description: 'Crop images by selecting a region. 100% private — your files never leave your device.',
     h1: 'Crop Images Online — Free & Private',
     seoContent: 'Select and export a region of any image. Drag to crop with pixel-perfect precision. All processing runs locally in your browser — your files stay on your device.',
+    faqs: [
+      { q: 'Can I crop to exact pixel dimensions?', a: 'Yes. You can drag to select a region or enter exact pixel coordinates for precise cropping. The tool shows the selection dimensions in real time.' },
+      { q: 'Is my image uploaded when I crop it?', a: 'No. Cropping happens entirely in your browser. Your image stays on your device throughout the entire process — nothing is transmitted to any server.' },
+      { q: 'What image formats can I crop?', a: 'You can crop JPEG, PNG, WebP, and AVIF images. The cropped result is saved in the same format as the original.' },
+    ],
   },
   {
     path: '/strip-metadata',
@@ -50,6 +73,12 @@ const ROUTES = [
     description: 'Remove GPS location, device info, timestamps, and other metadata from images and PDFs. 100% private — nothing is uploaded.',
     h1: 'Strip Metadata from Images & PDFs — Free & Private',
     seoContent: 'Remove EXIF data, GPS coordinates, camera info, timestamps, and other hidden metadata from your images and PDFs. Essential for privacy before sharing files. All processing happens on your device.',
+    faqs: [
+      { q: 'What metadata is removed from my files?', a: 'For images: EXIF data including GPS location, camera model, lens info, timestamps, software used, and all other embedded metadata. For PDFs: author, title, subject, keywords, creator application, creation and modification dates.' },
+      { q: 'Why should I strip metadata before sharing files?', a: 'Photos often contain GPS coordinates revealing where they were taken, device serial numbers, and timestamps. PDFs may contain author names, revision history, and editing software details. Removing this data protects your privacy and prevents accidental information disclosure.' },
+      { q: 'Is my file uploaded to remove metadata?', a: 'No. Metadata stripping happens entirely in your browser. This is especially important since the whole point of stripping metadata is privacy — your files should never be sent to a third-party server during this process.' },
+      { q: 'Can I strip metadata from multiple files at once?', a: 'Yes. Pro users can batch-process multiple files simultaneously. Drop multiple images or PDFs and all metadata will be stripped in one operation.' },
+    ],
   },
   {
     path: '/image-to-pdf',
@@ -60,6 +89,12 @@ const ROUTES = [
     description: 'Combine images into a single PDF document. 100% private — your files never leave your device.',
     h1: 'Convert Images to PDF — Free & Private',
     seoContent: 'Combine multiple images into a single PDF document. Drag to reorder, adjust page sizes, and export instantly. Everything runs in your browser — no upload needed.',
+    faqs: [
+      { q: 'Can I combine multiple images into one PDF?', a: 'Yes. Drop multiple images, drag to reorder them, and export as a single PDF document. Each image becomes a page in the PDF.' },
+      { q: 'What image formats can I convert to PDF?', a: 'You can convert JPEG, PNG, WebP, and AVIF images to PDF. Unsupported formats are automatically converted to PNG before PDF embedding.' },
+      { q: 'Are my images uploaded to create the PDF?', a: 'No. The PDF is created entirely in your browser using pdf-lib. Your images never leave your device.' },
+      { q: 'Can I adjust the page size of the PDF?', a: 'Yes. You can fit images to standard page sizes or create pages that match the image dimensions exactly.' },
+    ],
   },
   {
     path: '/pdf-to-image',
@@ -70,6 +105,12 @@ const ROUTES = [
     description: 'Convert PDF pages to high-quality JPEG or PNG images. 100% private — your files never leave your device.',
     h1: 'Convert PDF to Image — Free & Private',
     seoContent: 'Convert PDF pages to high-quality JPEG or PNG images. Choose resolution and format. All conversion happens locally — your PDFs never leave your device.',
+    faqs: [
+      { q: 'Can I choose the output image format?', a: 'Yes. You can convert PDF pages to either JPEG or PNG format. JPEG is best for smaller file sizes, while PNG preserves full quality with lossless compression.' },
+      { q: 'Can I control the resolution of the output images?', a: 'Yes. You can choose the rendering resolution. Higher resolutions produce sharper images but larger file sizes.' },
+      { q: 'Is my PDF uploaded during conversion?', a: 'No. PDF rendering and image conversion happen entirely in your browser. Your document never leaves your device.' },
+      { q: 'Can I convert specific pages rather than the whole PDF?', a: 'Yes. You can select which pages to convert rather than converting the entire document.' },
+    ],
   },
   {
     path: '/compress-pdf',
@@ -81,6 +122,12 @@ const ROUTES = [
     h1: 'Compress PDF Online — Free & Private',
     seoContent: 'Reduce PDF file size with smart or aggressive compression. Smart mode preserves text and vectors while optimizing embedded images. Your PDFs are never uploaded — all processing runs locally.',
     defaultMode: 'compress',
+    faqs: [
+      { q: 'What is the difference between Smart and Aggressive compression?', a: 'Smart compression optimizes embedded images while preserving text, fonts, and vector graphics — text remains selectable and sharp. Aggressive compression rasterizes pages for maximum size reduction but loses text selectability.' },
+      { q: 'How much can PDF compression reduce file size?', a: 'Results vary based on content. PDFs with large embedded images typically see 40–70% size reduction with Smart mode. Scan-heavy PDFs can see even greater reductions with Aggressive mode.' },
+      { q: 'Is my PDF uploaded for compression?', a: 'No. All compression happens in your browser. Smart mode uses SSIM-guided quality optimization locally. Your documents never leave your device.' },
+      { q: 'Will compression affect text quality in my PDF?', a: 'With Smart mode, text remains perfectly sharp and selectable — only embedded images are re-encoded. Aggressive mode rasterizes everything, so text becomes an image.' },
+    ],
   },
   {
     path: '/pdf-toolkit',
@@ -91,6 +138,11 @@ const ROUTES = [
     description: 'All-in-one PDF toolkit: merge, split, rotate, watermark, add page numbers. 100% private — nothing is uploaded.',
     h1: 'PDF Toolkit — Free & Private',
     seoContent: 'A complete PDF toolkit: merge multiple files, split by page range, rotate pages, add watermarks, and insert page numbers. All processing runs locally in your browser — your documents never leave your device.',
+    faqs: [
+      { q: 'What PDF operations does the toolkit include?', a: 'Merge multiple PDFs, split by page range, rotate pages (90°, 180°, 270°), add text watermarks with custom styling, and insert page numbers with configurable position and format.' },
+      { q: 'Are my PDFs uploaded to any server?', a: 'No. All operations run entirely in your browser using pdf-lib. Your documents never leave your device, making it safe for confidential files.' },
+      { q: 'Can I use the toolkit offline?', a: 'Yes. Once the page is loaded, all tools work completely offline. You can disconnect from the internet and continue processing PDFs.' },
+    ],
   },
   {
     path: '/merge-pdf',
@@ -102,6 +154,12 @@ const ROUTES = [
     h1: 'Merge PDF Files — Free & Private',
     seoContent: 'Combine multiple PDF files into a single document. Drag and drop to reorder pages. All merging happens in your browser — your documents are never uploaded to any server.',
     defaultMode: 'merge',
+    faqs: [
+      { q: 'How many PDFs can I merge at once?', a: 'You can merge as many PDFs as your device can handle. There is no artificial limit — the only constraint is your device\'s available memory.' },
+      { q: 'Can I reorder the PDFs before merging?', a: 'Yes. After adding files, drag and drop to reorder them. The final merged PDF will follow your chosen order.' },
+      { q: 'Are my documents uploaded during merging?', a: 'No. PDF merging happens entirely in your browser using pdf-lib. Your documents never leave your device — critical for contracts, legal filings, and confidential materials.' },
+      { q: 'Will merging change the content or formatting of my PDFs?', a: 'No. Merging combines the original pages without any re-encoding or modification. Text, images, fonts, and formatting are preserved exactly as they are.' },
+    ],
   },
   {
     path: '/split-pdf',
@@ -113,6 +171,11 @@ const ROUTES = [
     h1: 'Split PDF — Free & Private',
     seoContent: 'Split PDF documents into separate files by page range. Extract individual pages or groups. All processing happens in your browser — your files stay on your device.',
     defaultMode: 'split',
+    faqs: [
+      { q: 'Can I extract specific pages from a PDF?', a: 'Yes. Enter a page range (e.g., 1-3, 5, 8-12) to extract exactly the pages you need into a new PDF document.' },
+      { q: 'Is my PDF uploaded when I split it?', a: 'No. Splitting happens entirely in your browser. Your document never leaves your device.' },
+      { q: 'Does splitting affect the quality of the pages?', a: 'No. Pages are extracted without any re-encoding. Text, images, and formatting remain identical to the original.' },
+    ],
   },
   {
     path: '/rotate-pdf',
@@ -124,6 +187,11 @@ const ROUTES = [
     h1: 'Rotate PDF Pages — Free & Private',
     seoContent: 'Rotate individual PDF pages or all pages at once. Fix landscape/portrait orientation or upside-down scans. All processing happens in your browser — your documents never leave your device.',
     defaultMode: 'rotate',
+    faqs: [
+      { q: 'Can I rotate individual pages or all pages at once?', a: 'Both. You can rotate all pages by the same amount, or rotate individual pages independently to fix mixed-orientation scans.' },
+      { q: 'What rotation angles are available?', a: 'You can rotate pages by 90° (clockwise), 180°, or 270° (counter-clockwise).' },
+      { q: 'Is my PDF uploaded during rotation?', a: 'No. Rotation is applied entirely in your browser. Your document never leaves your device.' },
+    ],
   },
   {
     path: '/watermark-pdf',
@@ -135,6 +203,11 @@ const ROUTES = [
     h1: 'Add Watermark to PDF — Free & Private',
     seoContent: 'Add custom text watermarks to your PDF documents. Control opacity, font size, rotation, and color. All processing runs locally in your browser — your files are never uploaded.',
     defaultMode: 'watermark',
+    faqs: [
+      { q: 'Can I customize the watermark appearance?', a: 'Yes. You can control the watermark text, font size, opacity, rotation angle, color, and position on the page.' },
+      { q: 'Is my PDF uploaded to add the watermark?', a: 'No. The watermark is applied entirely in your browser. Your document never leaves your device.' },
+      { q: 'Is the watermark applied to all pages?', a: 'Yes. The watermark is applied to every page in the document with consistent positioning and styling.' },
+    ],
   },
   {
     path: '/pdf-page-numbers',
@@ -146,6 +219,11 @@ const ROUTES = [
     h1: 'Add Page Numbers to PDF — Free & Private',
     seoContent: 'Add page numbers to your PDF documents with customizable position, format, and starting number. Everything runs in your browser — your PDFs never leave your device.',
     defaultMode: 'pagenums',
+    faqs: [
+      { q: 'Can I choose where page numbers appear?', a: 'Yes. You can position page numbers at the top or bottom of the page, aligned left, center, or right.' },
+      { q: 'Can I start numbering from a specific page?', a: 'Yes. You can set a custom starting number, so page numbering begins wherever you need it.' },
+      { q: 'Is my PDF uploaded to add page numbers?', a: 'No. Page numbers are added entirely in your browser. Your document stays on your device.' },
+    ],
   },
   {
     path: '/redact-pdf',
@@ -156,6 +234,12 @@ const ROUTES = [
     description: 'Permanently redact sensitive content from PDFs. Draw over text, images, or any area to remove it. 100% private — nothing is uploaded.',
     h1: 'Redact PDF — Free & Private',
     seoContent: 'Permanently remove sensitive information from PDF documents. Draw rectangles over text, images, or any content to redact it. True redaction — the original content is destroyed, not just covered. All processing runs locally in your browser.',
+    faqs: [
+      { q: 'Is this true redaction or just a black box over text?', a: 'True redaction. The tool rasterizes each redacted page with the redaction rectangles burned in, permanently destroying the original content underneath. The redacted text cannot be recovered or selected.' },
+      { q: 'Is my PDF uploaded during redaction?', a: 'No. Redaction is performed entirely in your browser. This is critical for redaction specifically — the unredacted version of your document never exists anywhere but your device.' },
+      { q: 'Is this tool suitable for legal or HIPAA-compliant redaction?', a: 'The tool performs true content removal (not overlay), making it suitable for sensitive redaction needs. Since processing is 100% local, there is no third-party data disclosure — important for HIPAA, GDPR, and legal confidentiality requirements.' },
+      { q: 'What happens to pages I don\'t redact?', a: 'Unredacted pages are copied verbatim from the original PDF without any modification or quality loss. Only pages with redaction rectangles are rasterized.' },
+    ],
   },
   {
     path: '/pdf-pages',
@@ -166,6 +250,12 @@ const ROUTES = [
     description: 'Reorder, delete, and insert PDF pages with drag-and-drop. 100% private — nothing is uploaded.',
     h1: 'Organize PDF Pages — Free & Private',
     seoContent: 'Reorder, delete, and insert pages in your PDF documents. Visual drag-and-drop interface with page thumbnails. Everything runs locally — your PDFs never leave your device.',
+    faqs: [
+      { q: 'Can I see thumbnails of each page?', a: 'Yes. The tool generates visual thumbnails of every page so you can easily identify and rearrange content with drag-and-drop.' },
+      { q: 'Can I delete specific pages from a PDF?', a: 'Yes. Click to select pages you want to remove, then export the document without them. The remaining pages are unmodified.' },
+      { q: 'Is my PDF uploaded during page organization?', a: 'No. All page rendering and reorganization happens in your browser. Your document never leaves your device.' },
+      { q: 'Can I insert pages from another PDF?', a: 'Yes. You can add pages from additional PDFs and arrange them alongside the original pages using drag-and-drop.' },
+    ],
   },
 ];
 

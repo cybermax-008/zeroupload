@@ -19,6 +19,14 @@ export default function BlogIndexPage() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Privacy & Compliance Blog — Acorn Tools" />
         <meta name="twitter:description" content="Learn how browser-based file processing helps with HIPAA, GDPR, and privacy compliance." />
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Acorn Tools', item: BASE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Blog', item: `${BASE_URL}/blog` },
+          ],
+        })}</script>
       </Helmet>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>

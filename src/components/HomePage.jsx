@@ -45,6 +45,33 @@ export default function HomePage() {
         <meta property="og:title" content="Acorn Tools — Private PDF & Image Tools" />
         <meta property="og:description" content="Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device." />
         <meta property="og:url" content={BASE_URL + '/'} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={`${BASE_URL}/social-preview.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Acorn Tools — Free Private PDF & Image Tools" />
+        <meta name="twitter:description" content="Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device." />
+        <script type="application/ld+json">{JSON.stringify([
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'Acorn Tools',
+            url: BASE_URL,
+            description: 'Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device.',
+            applicationCategory: 'UtilitiesApplication',
+            operatingSystem: 'Any (browser-based)',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+            publisher: { '@type': 'Organization', name: 'Acorn Tools', url: BASE_URL },
+            featureList: 'Resize images, Compress images, Convert image formats, Crop images, Strip metadata, Image to PDF, PDF to image, Compress PDF, Merge PDFs, Split PDF, Rotate PDF, Watermark PDF, Page numbers, Redact PDF, Organize PDF pages',
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Acorn Tools',
+            url: BASE_URL,
+            logo: `${BASE_URL}/favicon.svg`,
+            description: 'Privacy-first PDF and image tools that run entirely in your browser.',
+          },
+        ])}</script>
       </Helmet>
 
       {/* ── Tool grid ── */}

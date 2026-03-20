@@ -12,20 +12,31 @@ export default function BlogArticlePage() {
 
   const relatedPosts = BLOG_POSTS.filter(p => p.slug !== slug);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    author: { '@type': 'Organization', name: 'Acorn Tools' },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Acorn Tools',
-      url: BASE_URL,
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description: post.description,
+      datePublished: post.date,
+      author: { '@type': 'Organization', name: 'Acorn Tools' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Acorn Tools',
+        url: BASE_URL,
+      },
+      mainEntityOfPage: `${BASE_URL}/blog/${post.slug}`,
     },
-    mainEntityOfPage: `${BASE_URL}/blog/${post.slug}`,
-  };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Acorn Tools', item: BASE_URL },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${BASE_URL}/blog` },
+        { '@type': 'ListItem', position: 3, name: post.title, item: `${BASE_URL}/blog/${post.slug}` },
+      ],
+    },
+  ];
 
   return (
     <>

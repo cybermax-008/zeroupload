@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useOutletContext } from 'react-router-dom';
 import { theme } from '../lib/theme';
@@ -35,6 +36,40 @@ export default function ToolPage({ routeKey }) {
   const toolProps = { onBeforeProcess, onOperationComplete };
   if (route.defaultMode) toolProps.defaultMode = route.defaultMode;
 
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: route.label + ' — Acorn Tools',
+      description: route.description,
+      url: `${BASE_URL}${route.path}`,
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any (browser-based)',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@type': 'Organization', name: 'Acorn Tools', url: BASE_URL },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Acorn Tools', item: BASE_URL },
+        { '@type': 'ListItem', position: 2, name: route.label, item: `${BASE_URL}${route.path}` },
+      ],
+    },
+  ];
+
+  if (route.faqs?.length) {
+    jsonLd.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: route.faqs.map(f => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    });
+  }
+
   return (
     <>
       <Helmet>
@@ -49,6 +84,7 @@ export default function ToolPage({ routeKey }) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={route.title} />
         <meta name="twitter:description" content={route.description} />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       <div style={{
@@ -106,6 +142,87 @@ export default function ToolPage({ routeKey }) {
       }}>
         <ToolComponent {...toolProps} />
       </main>
+
+      {route.faqs?.length > 0 && (
+        <FaqSection faqs={route.faqs} />
+      )}
     </>
+  );
+}
+
+// ══════════════════════════════════════════
+// FaqSection — Collapsible FAQ accordion
+// ══════════════════════════════════════════
+function FaqSection({ faqs }) {
+  return (
+    <section style={{ marginTop: 36 }}>
+      <h2 style={{
+        fontSize: 16, fontWeight: 700,
+        color: theme.text,
+        marginBottom: 14,
+      }}>
+        Frequently Asked Questions
+      </h2>
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 8,
+      }}>
+        {faqs.map((faq, i) => (
+          <FaqItem key={i} faq={faq} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FaqItem({ faq }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{
+      border: `1px solid ${theme.border}`,
+      borderRadius: theme.radius,
+      background: theme.surface,
+      overflow: 'hidden',
+    }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%',
+          padding: '14px 16px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', gap: 12,
+          fontFamily: theme.font,
+          textAlign: 'left',
+        }}
+      >
+        <span style={{
+          fontSize: 13, fontWeight: 600,
+          color: theme.text,
+          lineHeight: 1.4,
+        }}>
+          {faq.q}
+        </span>
+        <span style={{
+          fontSize: 14, color: theme.textMuted,
+          flexShrink: 0,
+          transition: theme.transition,
+          transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}>
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div style={{
+          padding: '0 16px 14px',
+          fontSize: 13, color: theme.textMuted,
+          lineHeight: 1.6,
+        }}>
+          {faq.a}
+        </div>
+      )}
+    </div>
   );
 }
