@@ -6,9 +6,18 @@ export function useBatch() {
   const [items, setItems] = useState([]);
   const [processing, setProcessing] = useState(false);
   const cancelRef = useRef(false);
+  const itemsRef = useRef([]);
+
+  const updateItems = (fn) => {
+    setItems((prev) => {
+      const next = typeof fn === 'function' ? fn(prev) : fn;
+      itemsRef.current = next;
+      return next;
+    });
+  };
 
   const addFiles = useCallback((files) => {
-    setItems((prev) => {
+    updateItems((prev) => {
       const remaining = 50 - prev.length;
       if (remaining <= 0) return prev;
       const toAdd = Array.from(files).slice(0, remaining).map((file) => ({
@@ -23,11 +32,11 @@ export function useBatch() {
   }, []);
 
   const removeFile = useCallback((id) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    updateItems((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
   const reset = useCallback(() => {
-    setItems([]);
+    updateItems([]);
     setProcessing(false);
     cancelRef.current = false;
   }, []);
@@ -40,29 +49,29 @@ export function useBatch() {
     setProcessing(true);
     cancelRef.current = false;
 
-    // Get current items snapshot for iteration
-    let currentItems;
-    setItems((prev) => { currentItems = prev; return prev; });
+    // Read current items from ref (always in sync)
+    const snapshot = itemsRef.current;
 
-    for (const item of currentItems) {
+    for (const item of snapshot) {
       if (item.status === 'done' || item.status === 'error') continue;
-
-      // Check cancel
       if (cancelRef.current) break;
 
-      // Set processing
-      setItems((prev) => prev.map((it) =>
+      // Mark processing
+      updateItems((prev) => prev.map((it) =>
         it.id === item.id ? { ...it, status: 'processing' } : it
       ));
 
+      // Yield to let React render the status update
+      await new Promise((r) => setTimeout(r, 0));
+
       try {
         const result = await processOneFn(item.file);
-        setItems((prev) => prev.map((it) =>
+        updateItems((prev) => prev.map((it) =>
           it.id === item.id ? { ...it, status: 'done', result } : it
         ));
         if (onOperationComplete) onOperationComplete();
       } catch (e) {
-        setItems((prev) => prev.map((it) =>
+        updateItems((prev) => prev.map((it) =>
           it.id === item.id ? { ...it, status: 'error', error: e.message } : it
         ));
       }
