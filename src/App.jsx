@@ -123,6 +123,19 @@ export default function App() {
             </Link>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Link
+                to="/blog"
+                style={{
+                  fontSize: 12, fontWeight: 500,
+                  color: theme.textMuted,
+                  textDecoration: 'none',
+                  transition: theme.transition,
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = theme.accent}
+                onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+              >
+                Blog
+              </Link>
               <ThemeToggle mode={themeMode} onToggle={toggleTheme} />
               {proUser ? <ProBadge /> : <UpgradeButton onClick={handleShowPaywall} />}
             </div>
@@ -316,6 +329,21 @@ export default function App() {
                 </svg>
                 Send Feedback
               </a>
+              <span style={{ color: theme.textDim }}>·</span>
+              <Link
+                to="/blog"
+                style={{
+                  color: theme.textMuted,
+                  textDecoration: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  transition: theme.transition,
+                  fontSize: 11,
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = theme.accent}
+                onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
+              >
+                Blog
+              </Link>
               {!proUser && (
                 <>
                   <span style={{ color: theme.textDim }}>·</span>
