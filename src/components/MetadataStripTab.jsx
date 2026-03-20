@@ -7,24 +7,26 @@ import {
   stripPdfMetadata,
 } from '../lib/metadataEngine';
 import { saveFile, baseName, humanSize, readAsArrayBuffer } from '../lib/fileUtils';
-import { DropZone, FileChip, Btn, StatusBadge } from './ui';
+import { isPro } from '../lib/usageGate';
+import { useBatch } from '../lib/useBatch';
+import { DropZone, FileChip, Btn, StatusBadge, BatchFileList, BatchProgress, BatchDownloadAll } from './ui';
 
 export default function MetadataStripTab({ onBeforeProcess, onOperationComplete }) {
+  // Single-file state
   const [file, setFile] = useState(null);
   const [metadata, setMetadata] = useState([]);
   const [status, setStatus] = useState('');
   const [isPdf, setIsPdf] = useState(false);
 
-  const onFiles = async (files) => {
-    const f = files[0];
-    if (!f) return;
-    setStatus('');
+  // Batch
+  const batch = useBatch();
+  const isBatch = batch.items.length > 1;
 
+  const setupSingleFile = async (f) => {
+    setStatus('');
     const pdf = f.type === 'application/pdf';
     setIsPdf(pdf);
     setFile(f);
-
-    // Read and display existing metadata
     try {
       if (pdf) {
         const entries = await readPdfMetadata(f);
@@ -38,6 +40,30 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
       }
     } catch {
       setMetadata([]);
+    }
+  };
+
+  const onFiles = async (files) => {
+    const valid = Array.from(files).filter(
+      (f) => f.type.startsWith('image/') || f.type === 'application/pdf'
+    );
+    if (!valid.length) return;
+
+    // Batch is Pro-only
+    if (!isPro() && (valid.length > 1 || batch.items.length >= 1)) {
+      if (batch.items.length === 0) {
+        batch.addFiles([valid[0]]);
+        await setupSingleFile(valid[0]);
+      }
+      if (onBeforeProcess) onBeforeProcess();
+      return;
+    }
+
+    batch.addFiles(valid);
+
+    // First single file — set up preview with metadata display
+    if (batch.items.length === 0 && valid.length === 1) {
+      await setupSingleFile(valid[0]);
     }
   };
 
@@ -61,98 +87,189 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
     }
   };
 
+  const processOne = async (f) => {
+    const pdf = f.type === 'application/pdf';
+    let result;
+    if (pdf) {
+      result = await stripPdfMetadata(f);
+    } else {
+      result = await stripImageMetadata(f);
+    }
+    const ext = pdf ? '.pdf' : f.name.match(/\.\w+$/)?.[0] || '.jpg';
+    return { blob: result.blob, filename: baseName(f.name) + '_clean' + ext };
+  };
+
+  const handleProcessAll = () => {
+    batch.processBatch(processOne, { onOperationComplete });
+  };
+
+  const handleDownloadOne = (item) => {
+    if (item.result) saveFile(item.result.blob, item.result.filename);
+  };
+
+  const handleDownloadAll = async () => {
+    const done = batch.items.filter((it) => it.status === 'done' && it.result);
+    for (const item of done) {
+      saveFile(item.result.blob, item.result.filename);
+      await new Promise((r) => setTimeout(r, 300));
+    }
+  };
+
   const reset = () => {
     setFile(null);
     setMetadata([]);
     setStatus('');
+    batch.reset();
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {!file ? (
+  // ── No files ──
+  if (batch.items.length === 0) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <DropZone
           accept="image/*,.pdf"
+          multiple
           onFiles={onFiles}
-          label="Drop an image or PDF to strip metadata"
-          sublabel="Removes GPS, device info, author, timestamps"
+          label="Drop images or PDFs to strip metadata"
+          sublabel="Removes GPS, device info, author, timestamps — drop multiple for batch"
         />
-      ) : (
-        <>
-          <FileChip name={file.name} size={file.size} onRemove={reset} />
+      </div>
+    );
+  }
 
-          {metadata.length > 0 ? (
-            <div style={{
-              border: `1px solid ${theme.border}`,
-              borderRadius: theme.radius,
-              overflow: 'hidden',
-            }}>
-              <div style={{
-                padding: '10px 14px',
-                background: theme.surfaceAlt,
-                borderBottom: `1px solid ${theme.border}`,
-              }}>
-                <span style={{
-                  fontSize: 12, fontWeight: 600, color: theme.text,
-                }}>
-                  Metadata Found ({metadata.length} fields)
-                </span>
-              </div>
-              <div style={{ maxHeight: 240, overflowY: 'auto' }}>
-                {metadata.map((entry, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'flex', gap: 12,
-                      padding: '8px 14px',
-                      borderBottom: i < metadata.length - 1 ? `1px solid ${theme.border}` : 'none',
-                      fontSize: 12,
-                    }}
-                  >
-                    <span style={{
-                      color: theme.accent, fontWeight: 500,
-                      minWidth: 120, flexShrink: 0,
-                    }}>
-                      {entry.tag}
-                    </span>
-                    <span style={{
-                      color: theme.textMuted, fontFamily: theme.fontMono,
-                      wordBreak: 'break-all',
-                    }}>
-                      {entry.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div style={{
-              padding: '16px',
-              background: theme.surfaceAlt,
-              borderRadius: theme.radius,
-              border: `1px solid ${theme.border}`,
-              fontSize: 12, color: theme.textMuted,
-            }}>
-              {isPdf
-                ? 'No readable metadata found (will still clean internal fields)'
-                : 'No EXIF metadata detected (will still re-encode to ensure clean output)'}
-            </div>
-          )}
+  // ── Single file (existing UX) ──
+  if (!isBatch) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <FileChip name={file?.name} size={file?.size} onRemove={reset} />
 
+        {metadata.length > 0 ? (
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 16,
+            border: `1px solid ${theme.border}`,
+            borderRadius: theme.radius,
+            overflow: 'hidden',
           }}>
-            <Btn onClick={process}>Strip Metadata</Btn>
-            <StatusBadge status={status} />
+            <div style={{
+              padding: '10px 14px',
+              background: theme.surfaceAlt,
+              borderBottom: `1px solid ${theme.border}`,
+            }}>
+              <span style={{
+                fontSize: 12, fontWeight: 600, color: theme.text,
+              }}>
+                Metadata Found ({metadata.length} fields)
+              </span>
+            </div>
+            <div style={{ maxHeight: 240, overflowY: 'auto' }}>
+              {metadata.map((entry, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex', gap: 12,
+                    padding: '8px 14px',
+                    borderBottom: i < metadata.length - 1 ? `1px solid ${theme.border}` : 'none',
+                    fontSize: 12,
+                  }}
+                >
+                  <span style={{
+                    color: theme.accent, fontWeight: 500,
+                    minWidth: 120, flexShrink: 0,
+                  }}>
+                    {entry.tag}
+                  </span>
+                  <span style={{
+                    color: theme.textMuted, fontFamily: theme.fontMono,
+                    wordBreak: 'break-all',
+                  }}>
+                    {entry.value}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-
+        ) : (
           <div style={{
-            fontSize: 11, color: theme.textDim, lineHeight: 1.5,
+            padding: '16px',
+            background: theme.surfaceAlt,
+            borderRadius: theme.radius,
+            border: `1px solid ${theme.border}`,
+            fontSize: 12, color: theme.textMuted,
           }}>
             {isPdf
-              ? 'Removes: title, author, creator, producer, subject, keywords, dates'
-              : 'Removes: GPS location, camera make/model, software, timestamps, all EXIF data'}
+              ? 'No readable metadata found (will still clean internal fields)'
+              : 'No EXIF metadata detected (will still re-encode to ensure clean output)'}
           </div>
-        </>
+        )}
+
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+        }}>
+          <Btn onClick={process}>Strip Metadata</Btn>
+          <StatusBadge status={status} />
+        </div>
+
+        <div style={{
+          fontSize: 11, color: theme.textDim, lineHeight: 1.5,
+        }}>
+          {isPdf
+            ? 'Removes: title, author, creator, producer, subject, keywords, dates'
+            : 'Removes: GPS location, camera make/model, software, timestamps, all EXIF data'}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Batch view ──
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>
+          {batch.items.length} files
+        </span>
+        <Btn small secondary onClick={reset}>Clear All</Btn>
+      </div>
+
+      <BatchFileList
+        items={batch.items}
+        onRemove={batch.removeFile}
+        onDownload={handleDownloadOne}
+        disabled={batch.processing}
+      />
+
+      <DropZone
+        accept="image/*,.pdf"
+        multiple
+        onFiles={onFiles}
+        label="Add more files"
+        compact
+      />
+
+      {/* Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        {batch.pendingCount > 0 && !batch.processing && (
+          <Btn onClick={handleProcessAll}>
+            Strip All ({batch.pendingCount})
+          </Btn>
+        )}
+        <BatchDownloadAll count={batch.doneCount} onClick={handleDownloadAll} />
+      </div>
+
+      <BatchProgress
+        progress={batch.progress}
+        processing={batch.processing}
+        onCancel={batch.cancel}
+      />
+
+      {!batch.processing && batch.doneCount + batch.errorCount > 0 && (
+        <div style={{
+          fontSize: 12, color: theme.textMuted, fontFamily: theme.fontMono,
+          display: 'flex', gap: 16,
+        }}>
+          {batch.doneCount > 0 && <span style={{ color: theme.success }}>{batch.doneCount} done</span>}
+          {batch.errorCount > 0 && <span style={{ color: theme.error }}>{batch.errorCount} failed</span>}
+        </div>
       )}
     </div>
   );

@@ -1037,3 +1037,169 @@ export function LicenseKeyDisplay({ licenseKey, onClose }) {
     </div>
   );
 }
+
+// ══════════════════════════════════════════
+// BatchFileList — List of files in a batch
+// ══════════════════════════════════════════
+export function BatchFileList({ items, onRemove, onDownload, disabled }) {
+  const statusColor = (s) =>
+    s === 'done' ? theme.success :
+    s === 'error' ? theme.error :
+    s === 'processing' ? theme.accent :
+    theme.textDim;
+
+  const statusLabel = (item) => {
+    if (item.status === 'pending') return 'Pending';
+    if (item.status === 'processing') return 'Processing…';
+    if (item.status === 'done') {
+      const reduction = item.result?.blob
+        ? Math.round((1 - item.result.blob.size / item.file.size) * 100)
+        : null;
+      const sizeStr = item.result?.blob ? humanSize(item.result.blob.size) : '';
+      return reduction !== null && reduction > 0
+        ? `Done · ${sizeStr} (−${reduction}%)`
+        : `Done${sizeStr ? ` · ${sizeStr}` : ''}`;
+    }
+    if (item.status === 'error') return item.error || 'Failed';
+    return '';
+  };
+
+  return (
+    <div style={{
+      maxHeight: 400, overflowY: 'auto',
+      border: `1px solid ${theme.border}`,
+      borderRadius: theme.radius,
+    }}>
+      {items.map((item, i) => (
+        <div
+          key={item.id}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '8px 12px',
+            borderBottom: i < items.length - 1 ? `1px solid ${theme.border}` : 'none',
+            background: item.status === 'processing' ? theme.accentGlow : 'transparent',
+          }}
+        >
+          <span style={{
+            flex: 1, fontSize: 12, fontWeight: 400,
+            overflow: 'hidden', textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap', color: theme.text,
+            opacity: item.status === 'pending' ? 0.5 : 1,
+          }}>
+            {item.file.name}
+          </span>
+
+          <span style={{
+            fontSize: 11, fontFamily: theme.fontMono,
+            color: theme.textDim, flexShrink: 0,
+          }}>
+            {humanSize(item.file.size)}
+          </span>
+
+          <span style={{
+            fontSize: 11, fontWeight: 500,
+            color: statusColor(item.status),
+            flexShrink: 0, minWidth: 80, textAlign: 'right',
+            animation: item.status === 'processing' ? 'pulse 1.2s ease infinite' : 'none',
+          }}>
+            {statusLabel(item)}
+          </span>
+
+          {item.status === 'done' && item.result && (
+            <button
+              onClick={() => onDownload(item)}
+              style={{
+                border: 'none', background: 'none',
+                color: theme.accent, cursor: 'pointer',
+                fontSize: 11, fontWeight: 600, padding: '2px 6px',
+                flexShrink: 0,
+              }}
+            >
+              Save
+            </button>
+          )}
+
+          {!disabled && (
+            <button
+              onClick={() => onRemove(item.id)}
+              style={{
+                border: 'none', background: 'none',
+                color: theme.textDim, cursor: 'pointer',
+                fontSize: 14, lineHeight: 1, padding: '0 2px',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => e.target.style.color = theme.error}
+              onMouseLeave={(e) => e.target.style.color = theme.textDim}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// BatchProgress — Progress bar + cancel
+// ══════════════════════════════════════════
+export function BatchProgress({ progress, processing, onCancel }) {
+  if (!processing && progress.done === 0) return null;
+  const pct = progress.total > 0 ? (progress.done / progress.total) * 100 : 0;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{
+        height: 6, borderRadius: 3,
+        background: theme.border, overflow: 'hidden',
+      }}>
+        <div style={{
+          height: '100%', borderRadius: 3,
+          background: theme.accent,
+          width: `${pct}%`,
+          transition: 'width 0.3s ease',
+        }} />
+      </div>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <span style={{
+          fontSize: 12, fontFamily: theme.fontMono, color: theme.textMuted,
+        }}>
+          {processing
+            ? `Processing ${progress.done + 1} of ${progress.total}…`
+            : `${progress.done} of ${progress.total} complete`}
+        </span>
+        {processing && (
+          <button
+            onClick={onCancel}
+            style={{
+              fontFamily: theme.font,
+              fontSize: 11, fontWeight: 500,
+              padding: '4px 12px', borderRadius: 6,
+              border: `1px solid ${theme.border}`,
+              background: 'transparent',
+              color: theme.textMuted,
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// BatchDownloadAll — Download all results
+// ══════════════════════════════════════════
+export function BatchDownloadAll({ count, onClick }) {
+  if (count === 0) return null;
+
+  return (
+    <Btn onClick={onClick}>
+      Download All ({count} files)
+    </Btn>
+  );
+}
