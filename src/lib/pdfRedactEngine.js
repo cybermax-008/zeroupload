@@ -99,10 +99,12 @@ export async function redactPdf(file, redactions, onProgress) {
   const bytes = await readFileAsArrayBuffer(file);
 
   const pdfjs = await initPdfjs();
-  const renderDoc = await pdfjs.getDocument({ data: bytes }).promise;
+  // pdfjs transfers the ArrayBuffer to a worker (detaches it),
+  // so give it a copy and keep the original for pdf-lib
+  const renderDoc = await pdfjs.getDocument({ data: bytes.slice(0) }).promise;
   const totalPages = renderDoc.numPages;
 
-  // Also load with pdf-lib for copying clean pages
+  // Load with pdf-lib for copying clean pages (uses the original buffer)
   const sourceDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
   const newDoc = await PDFDocument.create();
 
