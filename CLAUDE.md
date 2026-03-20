@@ -36,6 +36,8 @@ Engine state is stored as **module-level variables** (not React state) — a sin
 
 - `src/lib/metadataEngine.js` — EXIF/metadata stripping for images (canvas re-encode) and PDFs (pdf-lib field clearing). Includes a lightweight JPEG EXIF parser for display.
 - `src/lib/pdfPageEngine.js` — Page-level PDF operations (reorder, delete, insert, thumbnails) using pdf-lib + pdfjs-dist.
+- `src/lib/pdfRedactEngine.js` — True PDF redaction: rasterizes pages with redaction rectangles burned in (destroying original content). Clean pages copied verbatim. Uses normalized coordinates (0-1). **Important:** pdfjs-dist transfers ArrayBuffers to its worker — always use `bytes.slice(0)` when sharing a buffer between pdfjs and pdf-lib.
+
 **Note:** pdf-lib does NOT support PDF encryption. Do not attempt `save({ userPassword })` — it silently produces an unencrypted file.
 
 **PDF Compression** has two modes:
