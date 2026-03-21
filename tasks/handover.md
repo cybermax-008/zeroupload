@@ -1,16 +1,14 @@
 # Session Handover — 2026-03-20
 
 ## What was done
-- Added 2 more blog articles: legal/NDA compliance, SOX/finance compliance (5 articles total)
-- Added JSON-LD structured data on all pages (WebApplication, SoftwareApplication, FAQPage, BreadcrumbList)
-- Added collapsible FAQ sections to every tool page (3-4 questions each targeting common search queries)
-- Polished landing page for launch: stats bar, "Under the hood" tech section, trust signals linked to blog articles
-- Bumped free daily limit from 5 to 10 operations
-- Drafted Show HN and ProductHunt launch copy (not posted — launch on hold)
+- Set up Discord channel integration (bot token, pairing, allowlist policy)
+- Configured Claude Code permissions to auto-allow Discord MCP tools (no more prompts for reply/react/edit/fetch/download)
+- Previous session: SEO structured data, FAQ sections, 5 blog articles, landing page polish, free limit bumped to 10 ops/day
 
 ## Key decisions
 - **PH/HN launch on hold** — Vision expanded to building a comprehensive client-side tool suite beyond PDF/image before launching. More tools = stronger launch impact.
 - **Free limit bumped to 10** — Less friction for users, better reception when launch eventually happens.
+- **Discord DM policy set to allowlist** — Only approved senders can reach the bot.
 
 ## Next steps
 1. **Plan and prioritize new tool categories** — Candidate tools:

@@ -2,12 +2,12 @@
  * Acorn Tools Usage Gate
  *
  * Client-side usage tracking with localStorage.
- * Free: 10 operations/day. Pro: unlimited ($6.99 lifetime).
+ * Free: 30 operations/day. Pro: unlimited ($6.99 lifetime).
  */
 
 import { isCapacitor } from './fileUtils';
 
-const FREE_DAILY_LIMIT = 10;
+const FREE_DAILY_LIMIT = 30;
 const KEYS = {
   pro: 'acorn_pro',
   proSession: 'acorn_pro_session',
