@@ -3,7 +3,7 @@ import { theme } from '../lib/theme';
 import { imagesToPdf } from '../lib/pdfEngine';
 import { DropZone, FileChip, Btn, Toggle, StatusBadge, ArrowBtn } from './ui';
 
-export default function ImgToPdfTab({ onBeforeProcess, onOperationComplete }) {
+export default function ImgToPdfTab() {
   const [files, setFiles] = useState([]);
   const [pageSize, setPageSize] = useState('fit');
   const [margin, setMargin] = useState(0);
@@ -29,12 +29,10 @@ export default function ImgToPdfTab({ onBeforeProcess, onOperationComplete }) {
 
   const generate = async () => {
     if (!files.length) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await imagesToPdf(files, { pageSize, margin }, setStatus);
       result.download();
       setStatus(`Exported ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

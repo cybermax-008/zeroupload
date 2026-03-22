@@ -4,7 +4,7 @@ import { renderPagePreview, getRedactPageCount, redactPdf } from '../lib/pdfReda
 import { saveFile, baseName } from '../lib/fileUtils';
 import { DropZone, FileChip, Btn, StatusBadge } from './ui';
 
-export default function PdfRedactTab({ onBeforeProcess, onOperationComplete }) {
+export default function PdfRedactTab() {
   const [file, setFile] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -166,12 +166,10 @@ export default function PdfRedactTab({ onBeforeProcess, onOperationComplete }) {
 
   const process = async () => {
     if (!file || totalRedactions === 0) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await redactPdf(file, redactions, setStatus);
       await saveFile(result.blob, baseName(file.name) + '_redacted.pdf');
       setStatus(`Redacted ✓ · ${result.redactedPages} page${result.redactedPages !== 1 ? 's' : ''} modified`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

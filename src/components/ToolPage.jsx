@@ -30,10 +30,10 @@ const TOOL_COMPONENTS = {
 
 export default function ToolPage({ routeKey }) {
   const route = ROUTE_BY_PATH[routeKey];
-  const { onBeforeProcess, onOperationComplete } = useOutletContext();
+  useOutletContext();
   const ToolComponent = TOOL_COMPONENTS[route.toolId];
 
-  const toolProps = { onBeforeProcess, onOperationComplete };
+  const toolProps = {};
   if (route.defaultMode) toolProps.defaultMode = route.defaultMode;
 
   const jsonLd = [

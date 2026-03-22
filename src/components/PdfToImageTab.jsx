@@ -4,7 +4,7 @@ import { pdfToImages } from '../lib/pdfRenderEngine';
 import { humanSize } from '../lib/fileUtils';
 import { DropZone, FileChip, Btn, Toggle, StatusBadge } from './ui';
 
-export default function PdfToImageTab({ onBeforeProcess, onOperationComplete }) {
+export default function PdfToImageTab() {
   const [file, setFile] = useState(null);
   const [format, setFormat] = useState('image/jpeg');
   const [quality, setQuality] = useState(0.92);
@@ -28,7 +28,6 @@ export default function PdfToImageTab({ onBeforeProcess, onOperationComplete }) 
 
   const process = async () => {
     if (!file) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     setStatus('Initializing renderer…');
     setResults([]);
     setPreviews([]);
@@ -46,7 +45,6 @@ export default function PdfToImageTab({ onBeforeProcess, onOperationComplete }) 
       setPreviews(urls);
 
       setStatus(`Rendered ${imgs.length} page${imgs.length !== 1 ? 's' : ''} ✓`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { theme } from '../lib/theme';
 import { convertFormat, getEngineInfo } from '../lib/imageEngine';
 import { saveFile, readAsDataURL, baseName, humanSize, FORMAT_MAP } from '../lib/fileUtils';
-import { isPro } from '../lib/usageGate';
 import { useBatch } from '../lib/useBatch';
 import { DropZone, FileChip, Btn, Toggle, StatusBadge, BatchFileList, BatchProgress, BatchDownloadAll } from './ui';
 
 const FORMATS = Object.entries(FORMAT_MAP).map(([value, { label }]) => [value, label]);
 
-export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
+export default function ConvertTab() {
   // Single-file state
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -27,26 +26,6 @@ export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
   const onFiles = async (files) => {
     const valid = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (!valid.length) return;
-
-    // Batch is Pro-only
-    if (!isPro() && (valid.length > 1 || batch.items.length >= 1)) {
-      if (batch.items.length === 0) {
-        const f = valid[0];
-        batch.addFiles([f]);
-        setFile(f);
-        setStatus('');
-        setOutputSize(null);
-        const url = await readAsDataURL(f);
-        setPreview(url);
-        const detected = FORMAT_MAP[f.type] ? f.type : null;
-        setInputFormat(detected || f.type);
-        if (f.type === 'image/jpeg') setFormat('image/png');
-        else if (f.type === 'image/png') setFormat('image/jpeg');
-        else setFormat('image/jpeg');
-      }
-      if (onBeforeProcess) onBeforeProcess();
-      return;
-    }
 
     batch.addFiles(valid);
 
@@ -68,7 +47,6 @@ export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
 
   const process = async () => {
     if (!file) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     const engineLabel = engineInfo.type === 'vips' ? 'libvips' : 'Canvas';
     setStatus(`Converting with ${engineLabel}…`);
@@ -80,7 +58,6 @@ export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
       const ext = FORMAT_MAP[format]?.ext || '.png';
       await saveFile(blob, baseName(file.name) + ext);
       setStatus('Converted ✓');
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -93,7 +70,7 @@ export default function ConvertTab({ onBeforeProcess, onOperationComplete }) {
   };
 
   const handleProcessAll = () => {
-    batch.processBatch(processOne, { onOperationComplete });
+    batch.processBatch(processOne);
   };
 
   const handleDownloadOne = (item) => {

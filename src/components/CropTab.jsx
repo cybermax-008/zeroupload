@@ -14,7 +14,7 @@ const ASPECT_PRESETS = [
   { label: '3:2', ratio: 3 / 2 },
 ];
 
-export default function CropTab({ onBeforeProcess, onOperationComplete }) {
+export default function CropTab() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [imgW, setImgW] = useState(0);
@@ -152,7 +152,6 @@ export default function CropTab({ onBeforeProcess, onOperationComplete }) {
 
   const process = async () => {
     if (!file) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     setStatus(`Cropping with ${engineInfo.type === 'vips' ? 'libvips' : 'Canvas'}…`);
     setOutputSize(null);
@@ -163,7 +162,6 @@ export default function CropTab({ onBeforeProcess, onOperationComplete }) {
       const ext = FORMAT_MAP[format]?.ext || '.png';
       await saveFile(blob, baseName(file.name) + `_${crop.w}x${crop.h}` + ext);
       setStatus('Cropped ✓');
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

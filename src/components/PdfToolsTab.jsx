@@ -35,7 +35,7 @@ function validatePageRange(input, totalPages) {
   return null;
 }
 
-export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationComplete }) {
+export default function PdfToolsTab({ defaultMode }) {
   const [mode, setMode] = useState(defaultMode || 'merge');
   const [files, setFiles] = useState([]);
   const [splitRange, setSplitRange] = useState('');
@@ -118,12 +118,10 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doMerge = async () => {
     if (files.length < 2) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await mergePdfs(files, setStatus);
       result.download();
       setStatus(`Merged ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -131,12 +129,10 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doSplit = async () => {
     if (!files.length) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await splitPdf(files[0], splitRange, setStatus);
       result.download();
       setStatus(`Extracted ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -144,7 +140,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doRotate = async () => {
     if (!files.length) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await rotatePdf(
         files[0], rotation,
@@ -153,7 +148,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
       );
       result.download();
       setStatus(`Rotated ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -161,7 +155,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doCompress = async () => {
     if (!files.length) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     setCompressStats(null);
     try {
       const result = await compressPdf(files[0], compressQuality, setStatus, {
@@ -172,7 +165,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
       if (result.stats) setCompressStats(result.stats);
       result.download();
       setStatus(`Compressed ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -180,7 +172,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doWatermark = async () => {
     if (!files.length || !wmText.trim()) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await watermarkPdf(files[0], wmText.trim(), {
         fontSize: wmFontSize,
@@ -189,7 +180,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
       }, setStatus);
       result.download();
       setStatus(`Watermarked ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -197,7 +187,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
 
   const doPageNumbers = async () => {
     if (!files.length) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     try {
       const result = await addPageNumbers(files[0], {
         format: pnFormat,
@@ -206,7 +195,6 @@ export default function PdfToolsTab({ defaultMode, onBeforeProcess, onOperationC
       }, setStatus);
       result.download();
       setStatus(`Numbered ✓ · ${result.pageCount} pages`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

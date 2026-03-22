@@ -45,7 +45,7 @@ export function useBatch() {
     cancelRef.current = true;
   }, []);
 
-  const processBatch = useCallback(async (processOneFn, { onOperationComplete }) => {
+  const processBatch = useCallback(async (processOneFn) => {
     setProcessing(true);
     cancelRef.current = false;
 
@@ -69,7 +69,6 @@ export function useBatch() {
         updateItems((prev) => prev.map((it) =>
           it.id === item.id ? { ...it, status: 'done', result } : it
         ));
-        if (onOperationComplete) onOperationComplete();
       } catch (e) {
         updateItems((prev) => prev.map((it) =>
           it.id === item.id ? { ...it, status: 'error', error: e.message } : it

@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { theme } from '../lib/theme';
 import { BASE_URL } from '../lib/routes';
-import { PricingSection } from './ui';
 
 const TOOLS = [
   {
@@ -34,7 +33,6 @@ const TOOLS = [
 ];
 
 export default function HomePage() {
-  const { proUser, onShowPaywall } = useOutletContext();
 
   return (
     <>
@@ -112,10 +110,6 @@ export default function HomePage() {
       {/* ── Under the hood ── */}
       <TechStack />
 
-      {/* ── Pricing ── */}
-      {!proUser && (
-        <PricingSection onUpgrade={onShowPaywall} />
-      )}
     </>
   );
 }

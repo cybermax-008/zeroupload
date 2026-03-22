@@ -4,7 +4,7 @@ import { getPdfThumbnails, reorderPdfPages, deletePdfPages } from '../lib/pdfPag
 import { saveFile, baseName } from '../lib/fileUtils';
 import { DropZone, FileChip, Btn, StatusBadge } from './ui';
 
-export default function PdfPageOrganizerTab({ onBeforeProcess, onOperationComplete }) {
+export default function PdfPageOrganizerTab() {
   const [file, setFile] = useState(null);
   const [pages, setPages] = useState([]);   // { pageNum, url, originalIndex }
   const [selected, setSelected] = useState(new Set());
@@ -67,7 +67,6 @@ export default function PdfPageOrganizerTab({ onBeforeProcess, onOperationComple
       setStatus('Error: Cannot delete all pages');
       return;
     }
-    if (onBeforeProcess && !onBeforeProcess()) return;
     setStatus('Deleting pages…');
     try {
       const deleteIndices = new Set(
@@ -79,21 +78,18 @@ export default function PdfPageOrganizerTab({ onBeforeProcess, onOperationComple
       setPages(prev => prev.filter((_, i) => !selected.has(i)));
       setSelected(new Set());
       setStatus(`Deleted ${deleteIndices.size} pages ✓`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
   };
 
   const saveReordered = async () => {
-    if (onBeforeProcess && !onBeforeProcess()) return;
     setStatus('Saving…');
     try {
       const newOrder = pages.map(p => p.originalIndex);
       const result = await reorderPdfPages(file, newOrder, setStatus);
       await saveFile(result.blob, baseName(file.name) + '_reordered.pdf');
       setStatus(`Saved ✓ (${result.pageCount} pages)`);
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }

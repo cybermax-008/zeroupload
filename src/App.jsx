@@ -2,21 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { theme, globalStyles, getInitialTheme, applyTheme } from './lib/theme';
 import { initEngine, getEngineInfo, destroyEngine } from './lib/imageEngine';
-import { checkStripeRedirect, isPro, canUseOperation, recordOperation, getUsageInfo, getLicenseKey } from './lib/usageGate';
-import { EngineIndicator, UsageCounter, ProBadge, PaywallModal, UpgradeButton, RestoreModal, LicenseKeyDisplay } from './components/ui';
+import { EngineIndicator } from './components/ui';
 
 export default function App() {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const [mounted, setMounted] = useState(false);
   const [engineInfo, setEngineInfo] = useState(null);
-  const [proUser, setProUser] = useState(isPro);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [paywallLimitReached, setPaywallLimitReached] = useState(false);
-  const [showRestore, setShowRestore] = useState(false);
-  const [showLicenseKey, setShowLicenseKey] = useState(false);
-  const [licenseKey, setLicenseKey] = useState('');
-  const [usageInfo, setUsageInfo] = useState(getUsageInfo);
   const [themeMode, setThemeMode] = useState(getInitialTheme);
 
   useEffect(() => {
@@ -29,40 +21,12 @@ export default function App() {
 
   useEffect(() => {
     setMounted(true);
-    // Handle Stripe redirect
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get('session_id');
-    if (checkStripeRedirect()) {
-      setProUser(true);
-      setUsageInfo(getUsageInfo());
-      if (sessionId) {
-        setLicenseKey(sessionId);
-        setShowLicenseKey(true);
-      }
-    }
     initEngine(true).then((info) => {
       setEngineInfo(info);
     }).catch((err) => {
       console.error('[AcornTools] Engine init failed:', err);
     });
     return () => { destroyEngine(); };
-  }, []);
-
-  const handleBeforeProcess = useCallback(() => {
-    if (canUseOperation()) return true;
-    setPaywallLimitReached(true);
-    setShowPaywall(true);
-    return false;
-  }, []);
-
-  const handleOperationComplete = useCallback(() => {
-    recordOperation();
-    setUsageInfo(getUsageInfo());
-  }, []);
-
-  const handleShowPaywall = useCallback(() => {
-    setPaywallLimitReached(false);
-    setShowPaywall(true);
   }, []);
 
   return (
@@ -137,7 +101,6 @@ export default function App() {
                 Blog
               </Link>
               <ThemeToggle mode={themeMode} onToggle={toggleTheme} />
-              {proUser ? <ProBadge /> : <UpgradeButton onClick={handleShowPaywall} />}
             </div>
           </div>
 
@@ -182,49 +145,11 @@ export default function App() {
                 ready: true,
               }} />
             )}
-
-            {!proUser && <UsageCounter usageInfo={usageInfo} />}
           </div>
         </header>
 
         {/* ── Route content ── */}
-        <Outlet context={{
-          onBeforeProcess: handleBeforeProcess,
-          onOperationComplete: handleOperationComplete,
-          proUser,
-          onShowPaywall: handleShowPaywall,
-        }} />
-
-        {showPaywall && (
-          <PaywallModal limitReached={paywallLimitReached} onRestore={() => {
-            setShowPaywall(false);
-            setShowRestore(true);
-          }} onClose={() => {
-            setShowPaywall(false);
-            if (isPro()) {
-              setProUser(true);
-              setUsageInfo(getUsageInfo());
-            }
-          }} />
-        )}
-
-        {showRestore && (
-          <RestoreModal
-            onClose={() => setShowRestore(false)}
-            onRestored={() => {
-              setShowRestore(false);
-              setProUser(true);
-              setUsageInfo(getUsageInfo());
-            }}
-          />
-        )}
-
-        {showLicenseKey && licenseKey && (
-          <LicenseKeyDisplay
-            licenseKey={licenseKey}
-            onClose={() => setShowLicenseKey(false)}
-          />
-        )}
+        <Outlet context={{}} />
 
         {/* ── Footer ── */}
         <footer style={{
@@ -344,26 +269,6 @@ export default function App() {
               >
                 Blog
               </Link>
-              {!proUser && (
-                <>
-                  <span style={{ color: theme.textDim }}>·</span>
-                  <a
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); setShowRestore(true); }}
-                    style={{
-                      color: theme.textMuted,
-                      textDecoration: 'none',
-                      display: 'inline-flex', alignItems: 'center', gap: 5,
-                      transition: theme.transition,
-                      fontSize: 11,
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.color = theme.accent}
-                    onMouseLeave={e => e.currentTarget.style.color = theme.textMuted}
-                  >
-                    Restore Purchase
-                  </a>
-                </>
-              )}
             </div>
           </div>
         </footer>

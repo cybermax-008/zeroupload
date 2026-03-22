@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { theme } from '../lib/theme';
 import { compressImage, getEngineInfo } from '../lib/imageEngine';
 import { saveFile, readAsDataURL, baseName, humanSize, FORMAT_MAP } from '../lib/fileUtils';
-import { isPro } from '../lib/usageGate';
 import { useBatch } from '../lib/useBatch';
 import { DropZone, FileChip, Btn, Toggle, StatusBadge, NumInput, BatchFileList, BatchProgress, BatchDownloadAll } from './ui';
 
@@ -11,7 +10,7 @@ const LOSSY_FORMATS = [
   ['image/webp', 'WebP'],
 ];
 
-export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
+export default function CompressTab() {
   // Single-file state
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -32,24 +31,6 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
     const valid = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (!valid.length) return;
 
-    // Batch is Pro-only: free users who drop multiple files get first file + paywall
-    if (!isPro() && (valid.length > 1 || batch.items.length >= 1)) {
-      if (batch.items.length === 0) {
-        // Keep first file as single-file mode, show paywall for the rest
-        const f = valid[0];
-        batch.addFiles([f]);
-        setStatus('');
-        setOutputSize(null);
-        setInputSize(f.size);
-        setFile(f);
-        const url = await readAsDataURL(f);
-        setPreview(url);
-        setFormat(f.type === 'image/png' ? 'image/png' : 'image/jpeg');
-      }
-      if (onBeforeProcess) onBeforeProcess();
-      return;
-    }
-
     batch.addFiles(valid);
 
     // If this is the first single file, set up single-file preview
@@ -67,7 +48,6 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
 
   const process = async () => {
     if (!file) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     const engineInfo = getEngineInfo();
     const engineLabel = engineInfo.type === 'vips' ? 'libvips' : 'Lanczos3';
     setStatus(`Compressing with ${engineLabel}…`);
@@ -80,7 +60,6 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
       const ext = FORMAT_MAP[format]?.ext || '.jpg';
       await saveFile(blob, baseName(file.name) + '_compressed' + ext);
       setStatus('Compressed ✓');
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -94,7 +73,7 @@ export default function CompressTab({ onBeforeProcess, onOperationComplete }) {
   };
 
   const handleProcessAll = () => {
-    batch.processBatch(processOne, { onOperationComplete });
+    batch.processBatch(processOne);
   };
 
   const handleDownloadOne = (item) => {

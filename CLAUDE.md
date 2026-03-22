@@ -58,20 +58,13 @@ All styling is inline React style objects — no CSS files or class names. Desig
 - Browser: blob URL + `<a download>`
 - Capacitor: `Filesystem.writeFile()` + native Share sheet
 
-### Usage Gate & Monetization
+### Usage
 
-`src/lib/usageGate.js` — client-side usage tracking with localStorage. Free users get 10 operations/day; Pro users get unlimited. Gate checks happen at processing time via `onBeforeProcess`/`onOperationComplete` callbacks passed from `App.jsx` to all tool tabs.
-
-- **Stripe Payment Link** for $6.99 one-time purchase. URL hardcoded in `usageGate.js`.
-- **License key** = Stripe Checkout Session ID. Shown after payment, verifiable via `/api/verify-license`.
-- **Restore Purchase** flow: user pastes license key → serverless function verifies with Stripe API.
-- **Capacitor builds** bypass the gate entirely (`isCapacitor()` → always pro).
-
-`api/verify-license.js` — Vercel serverless function that validates license keys against Stripe API. Requires `STRIPE_SECRET_KEY` env var.
+All tools are completely free with no usage limits. The former monetization system (Stripe, usage gate, license keys) has been removed. `src/lib/usageGate.js` exists as a stub with no-op exports for compatibility.
 
 ### Batch Processing
 
-`src/lib/useBatch.js` — Pro-only multi-file processing for CompressTab, ConvertTab, MetadataStripTab. Uses `itemsRef` (not state) for the processing loop snapshot — React 18 batching makes `setState` updaters unreliable for synchronous reads in async functions. Each tab has three render paths: empty (DropZone), single-file (original UX unchanged), batch (2+ files). Free users who drop multiple files get the first file in single-file mode + paywall.
+`src/lib/useBatch.js` — Multi-file processing for CompressTab, ConvertTab, MetadataStripTab. Uses `itemsRef` (not state) for the processing loop snapshot — React 18 batching makes `setState` updaters unreliable for synchronous reads in async functions. Each tab has three render paths: empty (DropZone), single-file (original UX unchanged), batch (2+ files).
 
 ### Blog System
 
@@ -83,7 +76,7 @@ All pages include JSON-LD structured data via `react-helmet-async`. Tool pages h
 
 ### Component Structure
 
-Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. `onBeforeProcess`/`onOperationComplete` callbacks are passed via React Router's outlet context. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, `BatchFileList`, `BatchProgress`, `PaywallModal`, `RestoreModal`, etc.) live in `src/components/ui.jsx` with no domain logic.
+Each tab component (`ResizeTab`, `ImgToPdfTab`, `PdfToolsTab`) manages its own local state with `useState` — no global state management. Shared UI primitives (`DropZone`, `Btn`, `Toggle`, `StatusBadge`, `BatchFileList`, `BatchProgress`, etc.) live in `src/components/ui.jsx` with no domain logic.
 
 ## Deployment
 

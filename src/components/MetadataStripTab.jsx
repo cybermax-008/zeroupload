@@ -7,11 +7,10 @@ import {
   stripPdfMetadata,
 } from '../lib/metadataEngine';
 import { saveFile, baseName, humanSize, readAsArrayBuffer } from '../lib/fileUtils';
-import { isPro } from '../lib/usageGate';
 import { useBatch } from '../lib/useBatch';
 import { DropZone, FileChip, Btn, StatusBadge, BatchFileList, BatchProgress, BatchDownloadAll } from './ui';
 
-export default function MetadataStripTab({ onBeforeProcess, onOperationComplete }) {
+export default function MetadataStripTab() {
   // Single-file state
   const [file, setFile] = useState(null);
   const [metadata, setMetadata] = useState([]);
@@ -49,16 +48,6 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
     );
     if (!valid.length) return;
 
-    // Batch is Pro-only
-    if (!isPro() && (valid.length > 1 || batch.items.length >= 1)) {
-      if (batch.items.length === 0) {
-        batch.addFiles([valid[0]]);
-        await setupSingleFile(valid[0]);
-      }
-      if (onBeforeProcess) onBeforeProcess();
-      return;
-    }
-
     batch.addFiles(valid);
 
     // First single file — set up preview with metadata display
@@ -69,7 +58,6 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
 
   const process = async () => {
     if (!file) return;
-    if (onBeforeProcess && !onBeforeProcess()) return;
     setStatus('Stripping metadata…');
     try {
       let result;
@@ -81,7 +69,6 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
       const ext = isPdf ? '.pdf' : file.name.match(/\.\w+$/)?.[0] || '.jpg';
       await saveFile(result.blob, baseName(file.name) + '_clean' + ext);
       setStatus('Metadata stripped ✓');
-      if (onOperationComplete) onOperationComplete();
     } catch (e) {
       setStatus('Error: ' + e.message);
     }
@@ -100,7 +87,7 @@ export default function MetadataStripTab({ onBeforeProcess, onOperationComplete 
   };
 
   const handleProcessAll = () => {
-    batch.processBatch(processOne, { onOperationComplete });
+    batch.processBatch(processOne);
   };
 
   const handleDownloadOne = (item) => {
