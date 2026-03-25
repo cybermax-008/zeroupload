@@ -46,7 +46,7 @@ const ROUTES = [
       { q: 'What image formats can I convert between?', a: 'You can convert between JPEG, PNG, WebP, and AVIF formats. Common conversions include PNG to JPG, WebP to PNG, AVIF to JPEG, and JPG to WebP.' },
       { q: 'Does converting formats reduce image quality?', a: 'Converting to lossy formats (JPEG, WebP) involves some quality trade-off, but you can control the quality setting. Converting to lossless formats (PNG) preserves full quality.' },
       { q: 'Are my images uploaded during conversion?', a: 'No. All format conversion happens locally in your browser. Your images never leave your device, making it safe for sensitive or private photos.' },
-      { q: 'Can I convert multiple images at once?', a: 'Yes. Pro users can batch-convert multiple images simultaneously. Drop multiple files and they will all be converted to your chosen format.' },
+      { q: 'Can I convert multiple images at once?', a: 'Yes. You can batch-convert multiple images simultaneously. Drop multiple files and they will all be converted to your chosen format.' },
     ],
   },
   {
@@ -77,7 +77,7 @@ const ROUTES = [
       { q: 'What metadata is removed from my files?', a: 'For images: EXIF data including GPS location, camera model, lens info, timestamps, software used, and all other embedded metadata. For PDFs: author, title, subject, keywords, creator application, creation and modification dates.' },
       { q: 'Why should I strip metadata before sharing files?', a: 'Photos often contain GPS coordinates revealing where they were taken, device serial numbers, and timestamps. PDFs may contain author names, revision history, and editing software details. Removing this data protects your privacy and prevents accidental information disclosure.' },
       { q: 'Is my file uploaded to remove metadata?', a: 'No. Metadata stripping happens entirely in your browser. This is especially important since the whole point of stripping metadata is privacy — your files should never be sent to a third-party server during this process.' },
-      { q: 'Can I strip metadata from multiple files at once?', a: 'Yes. Pro users can batch-process multiple files simultaneously. Drop multiple images or PDFs and all metadata will be stripped in one operation.' },
+      { q: 'Can I strip metadata from multiple files at once?', a: 'Yes. You can batch-process multiple files simultaneously. Drop multiple images or PDFs and all metadata will be stripped in one operation.' },
     ],
   },
   {
