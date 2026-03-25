@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { copyFileSync, mkdirSync } from 'fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 // Copy wasm-vips WASM binary to build output with its original name.
@@ -21,10 +21,46 @@ function copyVipsWasm() {
   };
 }
 
+// Auto-generate sitemap.xml from routes.js + blogPosts.js at build time.
+// Parses source files directly to avoid import chain issues in Node context.
+function generateSitemap() {
+  return {
+    name: 'generate-sitemap',
+    writeBundle(options) {
+      const outDir = options.dir || 'dist';
+      const base = 'https://www.acorntools.net';
+
+      // Extract tool paths from routes.js
+      const routesSrc = readFileSync(resolve('src/lib/routes.js'), 'utf-8');
+      const toolPaths = [...routesSrc.matchAll(/path:\s*'(\/[^']+)'/g)].map(m => m[1]);
+
+      // Extract blog slugs from blogPosts.js
+      const blogSrc = readFileSync(resolve('src/lib/blogPosts.js'), 'utf-8');
+      const blogSlugs = [...blogSrc.matchAll(/slug:\s*'([^']+)'/g)].map(m => m[1]);
+
+      const today = new Date().toISOString().split('T')[0];
+      const urls = [
+        `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>`,
+        ...toolPaths.map(p =>
+          `  <url>\n    <loc>${base}${p}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>`
+        ),
+        `  <url>\n    <loc>${base}/blog</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`,
+        ...blogSlugs.map(s =>
+          `  <url>\n    <loc>${base}/blog/${s}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>`
+        ),
+      ];
+
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+      writeFileSync(resolve(outDir, 'sitemap.xml'), xml);
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
     copyVipsWasm(),
+    generateSitemap(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
