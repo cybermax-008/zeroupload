@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { theme } from '../lib/theme';
 import { BLOG_POSTS, BLOG_POST_BY_SLUG, BASE_URL } from '../lib/blogPosts';
+import { ROUTES } from '../lib/routes';
 
 export default function BlogArticlePage() {
   const { slug } = useParams();
@@ -56,9 +57,9 @@ export default function BlogArticlePage() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
-      {/* ── Breadcrumb ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
+      {/* ── Visible breadcrumb ── */}
+      <nav aria-label="Breadcrumb" style={{
+        display: 'flex', alignItems: 'center', gap: 6,
         marginBottom: 24, flexWrap: 'wrap',
       }}>
         <Link
@@ -66,19 +67,14 @@ export default function BlogArticlePage() {
           style={{
             fontFamily: theme.font,
             fontSize: 12, fontWeight: 500,
-            padding: '6px 14px',
-            borderRadius: 6,
-            border: `1px solid ${theme.border}`,
-            background: 'transparent',
             color: theme.textMuted,
-            cursor: 'pointer',
-            transition: theme.transition,
-            display: 'flex', alignItems: 'center', gap: 6,
             textDecoration: 'none',
+            transition: theme.transition,
           }}
         >
-          <span style={{ fontSize: 14 }}>←</span> All Tools
+          Acorn Tools
         </Link>
+        <span style={{ fontSize: 11, color: theme.textDim }}>›</span>
         <Link
           to="/blog"
           style={{
@@ -91,11 +87,11 @@ export default function BlogArticlePage() {
         >
           Blog
         </Link>
-        <span style={{ color: theme.textDim, fontSize: 11 }}>·</span>
-        <span style={{ fontSize: 12, color: theme.textDim }}>
+        <span style={{ fontSize: 11, color: theme.textDim }}>›</span>
+        <span style={{ fontSize: 12, fontWeight: 500, color: theme.textDim }}>
           {post.category}
         </span>
-      </div>
+      </nav>
 
       {/* ── Article header ── */}
       <div style={{ marginBottom: 32 }}>
@@ -183,6 +179,46 @@ export default function BlogArticlePage() {
         }}>
           {post.ctas.map((cta) => (
             <CtaButton key={cta.path} cta={cta} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── All tools (internal linking) ── */}
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{
+          fontSize: 12, fontWeight: 600,
+          color: theme.textMuted,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          marginBottom: 10,
+        }}>
+          All free tools — no upload required
+        </h2>
+        <div style={{
+          display: 'flex', gap: 8,
+          flexWrap: 'wrap',
+        }}>
+          {ROUTES.map((r) => (
+            <Link
+              key={r.path}
+              to={r.path}
+              style={{
+                fontFamily: theme.font,
+                fontSize: 11, fontWeight: 500,
+                padding: '5px 10px',
+                borderRadius: 5,
+                border: `1px solid ${theme.border}`,
+                background: 'transparent',
+                color: theme.textMuted,
+                textDecoration: 'none',
+                transition: theme.transition,
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span style={{ color: theme.accent }}>{r.icon}</span>
+              {r.label}
+            </Link>
           ))}
         </div>
       </div>

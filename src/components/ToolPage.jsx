@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useOutletContext } from 'react-router-dom';
 import { theme } from '../lib/theme';
 import { ROUTE_BY_PATH, BASE_URL } from '../lib/routes';
+import { TOOL_CONTENT } from '../lib/toolContent';
 import ResizeTab from './ResizeTab';
 import CompressTab from './CompressTab';
 import ConvertTab from './ConvertTab';
@@ -70,6 +71,8 @@ export default function ToolPage({ routeKey }) {
     });
   }
 
+  const content = TOOL_CONTENT[route.path];
+
   return (
     <>
       <Helmet>
@@ -87,37 +90,33 @@ export default function ToolPage({ routeKey }) {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        marginBottom: 16,
+      {/* ── Visible breadcrumb ── */}
+      <nav aria-label="Breadcrumb" style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        marginBottom: 16, flexWrap: 'wrap',
       }}>
         <Link
           to="/"
           style={{
             fontFamily: theme.font,
             fontSize: 12, fontWeight: 500,
-            padding: '6px 14px',
-            borderRadius: 6,
-            border: `1px solid ${theme.border}`,
-            background: 'transparent',
             color: theme.textMuted,
-            cursor: 'pointer',
-            transition: theme.transition,
-            display: 'flex', alignItems: 'center', gap: 6,
             textDecoration: 'none',
+            transition: theme.transition,
           }}
         >
-          <span style={{ fontSize: 14 }}>←</span> All Tools
+          Acorn Tools
         </Link>
+        <span style={{ fontSize: 11, color: theme.textDim }}>›</span>
         <span style={{
-          fontSize: 14, fontWeight: 600,
+          fontSize: 12, fontWeight: 600,
           color: theme.text,
-          display: 'flex', alignItems: 'center', gap: 8,
+          display: 'flex', alignItems: 'center', gap: 6,
         }}>
           <span style={{ color: theme.accent }}>{route.icon}</span>
           {route.label}
         </span>
-      </div>
+      </nav>
 
       <h1 style={{
         fontSize: 22, fontWeight: 700,
@@ -143,10 +142,130 @@ export default function ToolPage({ routeKey }) {
         <ToolComponent {...toolProps} />
       </main>
 
+      {/* ── Rich content sections (SEO) ── */}
+      {content?.sections?.length > 0 && (
+        <ContentSections sections={content.sections} />
+      )}
+
+      {/* ── Related tools (internal linking) ── */}
+      {content?.relatedTools?.length > 0 && (
+        <RelatedTools paths={content.relatedTools} currentPath={route.path} />
+      )}
+
       {route.faqs?.length > 0 && (
         <FaqSection faqs={route.faqs} />
       )}
     </>
+  );
+}
+
+// ══════════════════════════════════════════
+// ContentSections — Rich below-tool SEO content
+// ══════════════════════════════════════════
+function ContentSections({ sections }) {
+  return (
+    <article style={{ marginTop: 36, maxWidth: 640 }}>
+      {sections.map((section, i) => (
+        <section key={i} style={{ marginBottom: 28 }}>
+          <h2 style={{
+            fontSize: 16, fontWeight: 700,
+            color: theme.text,
+            marginBottom: 10,
+            lineHeight: 1.3,
+          }}>
+            {section.heading}
+          </h2>
+          {section.paragraphs.map((p, j) => (
+            <p key={j} style={{
+              fontSize: 13, color: theme.textMuted,
+              lineHeight: 1.7,
+              marginBottom: 10,
+            }}>
+              {p}
+            </p>
+          ))}
+        </section>
+      ))}
+    </article>
+  );
+}
+
+// ══════════════════════════════════════════
+// RelatedTools — Internal cross-links
+// ══════════════════════════════════════════
+function RelatedTools({ paths, currentPath }) {
+  const tools = paths
+    .filter(p => p !== currentPath)
+    .map(p => ROUTE_BY_PATH[p])
+    .filter(Boolean);
+
+  if (!tools.length) return null;
+
+  return (
+    <section style={{ marginTop: 32 }}>
+      <h2 style={{
+        fontSize: 12, fontWeight: 600,
+        color: theme.textMuted,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        marginBottom: 12,
+      }}>
+        Related tools
+      </h2>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: 8,
+      }}>
+        {tools.map((t) => (
+          <RelatedToolCard key={t.path} tool={t} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RelatedToolCard({ tool }) {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <Link
+      to={tool.path}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        fontFamily: theme.font,
+        textDecoration: 'none',
+        padding: '14px 14px',
+        borderRadius: theme.radius,
+        border: `1px solid ${hover ? theme.borderActive : theme.border}`,
+        background: hover ? theme.surfaceHover : theme.surface,
+        cursor: 'pointer',
+        transition: theme.transition,
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}
+    >
+      <span style={{
+        fontSize: 16, color: theme.accent,
+        width: 22, textAlign: 'center', flexShrink: 0,
+      }}>
+        {tool.icon}
+      </span>
+      <div>
+        <div style={{
+          fontSize: 13, fontWeight: 600,
+          color: theme.text,
+        }}>
+          {tool.label}
+        </div>
+        <div style={{
+          fontSize: 11, color: theme.textMuted,
+          lineHeight: 1.3, marginTop: 2,
+        }}>
+          {tool.description?.slice(0, 60)}...
+        </div>
+      </div>
+    </Link>
   );
 }
 

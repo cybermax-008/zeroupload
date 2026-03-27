@@ -328,6 +328,270 @@ const BLOG_POSTS = [
       },
     ],
   },
+
+  // ── How-to articles targeting long-tail search queries ──
+
+  {
+    slug: 'compress-pdf-without-adobe',
+    title: 'How to Compress a PDF Without Adobe Acrobat',
+    metaTitle: 'How to Compress a PDF Without Adobe Acrobat — Acorn Tools',
+    description: 'Reduce PDF file size for free without Adobe Acrobat or any software. Learn how browser-based compression works and when to use smart vs. aggressive mode.',
+    date: '2026-03-27',
+    readTime: '5 min read',
+    category: 'How-To Guide',
+    ctas: [
+      { label: 'Compress PDF', path: '/compress-pdf', icon: '▼' },
+      { label: 'Merge PDFs', path: '/merge-pdf', icon: '⊕' },
+      { label: 'Compress Images', path: '/compress-image', icon: '▼' },
+    ],
+    sections: [
+      {
+        heading: 'Why people look for Adobe alternatives',
+        paragraphs: [
+          'Adobe Acrobat Pro costs $19.99/month. For someone who needs to compress a PDF once a week — to email a contract, submit a court filing, or upload to a portal with a file size limit — that subscription is hard to justify. And the free version of Acrobat Reader doesn\'t include compression.',
+          'The result is that millions of people search for "compress PDF free" or "compress PDF without Adobe" every month. The alternatives they find are mostly online tools that upload your document to a server, compress it remotely, and send it back. That works — but it means your document sits on someone else\'s infrastructure during processing.',
+        ],
+      },
+      {
+        heading: 'The three types of PDF compressors',
+        paragraphs: [
+          'Server-based tools (iLovePDF, SmallPDF, etc.) upload your file, process it on their servers, and return the result. They\'re convenient but your document leaves your device. Most impose file size limits or require accounts for repeated use.',
+          'Desktop software (Adobe Acrobat, Preview on Mac, various open-source tools) runs locally but requires installation. On corporate machines, installing software often requires IT approval.',
+          'Browser-based tools run in your web browser using WebAssembly. No installation, no upload, no server processing. The file stays on your device throughout. Acorn Tools falls into this category — it uses the same compression algorithms as server-based tools, but executes them in your browser tab.',
+        ],
+      },
+      {
+        heading: 'How smart PDF compression works',
+        paragraphs: [
+          'Most PDF file size comes from embedded images — scanned pages, photographs, diagrams. Smart compression targets these images specifically. It enumerates every image in the PDF, measures the perceptual quality impact of re-encoding at various quality levels (using SSIM — Structural Similarity Index), and replaces each image at the optimal quality.',
+          'Text, fonts, vector graphics, and annotations are preserved exactly. Text remains selectable and searchable. Only the images are re-encoded. This is why smart compression can reduce a scan-heavy PDF by 40–70% without visible quality loss.',
+        ],
+      },
+      {
+        heading: 'When to use aggressive compression',
+        paragraphs: [
+          'Aggressive compression rasterizes every page — converting the entire page (text, images, vectors) into a single image, then re-encoding as JPEG. This produces the smallest files but text becomes an image: it\'s no longer selectable or searchable.',
+          'Use aggressive mode for scanned documents that are already images (no selectable text to preserve), documents where file size is the top priority (email limits, portal uploads), and archival copies where text search isn\'t needed.',
+        ],
+      },
+      {
+        heading: 'Step by step: compress a PDF in your browser',
+        paragraphs: [
+          'Open the Compress PDF tool. Drop your PDF file onto the page (or click to browse). Choose Smart or Aggressive mode. For Smart mode, the tool analyzes embedded images and shows the estimated reduction. Click compress and download the result.',
+          'The entire process happens in your browser tab. You can verify this by opening your browser\'s Network tab in Developer Tools — you\'ll see zero outbound requests during compression. Your document never leaves your device.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'remove-exif-data-before-sharing-photos',
+    title: 'How to Remove EXIF Data From Photos Before Sharing',
+    metaTitle: 'How to Remove EXIF Data From Photos Before Sharing — Acorn Tools',
+    description: 'Your photos contain hidden GPS coordinates, device info, and timestamps. Learn what EXIF data is, why it matters, and how to strip it before posting online.',
+    date: '2026-03-27',
+    readTime: '5 min read',
+    category: 'Privacy Guide',
+    ctas: [
+      { label: 'Strip Metadata', path: '/strip-metadata', icon: '⊘' },
+      { label: 'Compress Images', path: '/compress-image', icon: '▼' },
+      { label: 'Convert Format', path: '/convert-image', icon: '⇄' },
+    ],
+    sections: [
+      {
+        heading: 'What EXIF data is hiding in your photos',
+        paragraphs: [
+          'Every photo taken with a smartphone or digital camera contains EXIF (Exchangeable Image File Format) metadata embedded invisibly in the file. This includes GPS coordinates (latitude and longitude of where the photo was taken), the exact date and time, your device model and serial number, camera settings (aperture, shutter speed, ISO), and sometimes a thumbnail of the original image.',
+          'On a smartphone, this often means every photo you take is tagged with your exact location. A photo taken at home reveals your home address. A photo taken at work reveals your workplace. This data persists when you share the file — unless you explicitly remove it.',
+        ],
+      },
+      {
+        heading: 'Why EXIF data is a privacy risk',
+        paragraphs: [
+          'When you share a photo via email, messaging apps, cloud storage, or forums, the EXIF data often travels with it. Anyone who receives the file can extract the GPS coordinates using free tools or even the file properties dialog in their operating system.',
+          'Journalists, activists, domestic violence survivors, and anyone with safety concerns have specific reasons to strip location data. But even for everyday use, sharing your precise location history with strangers on the internet is an unnecessary risk. Some social media platforms strip EXIF on upload (Instagram, Twitter/X), but many don\'t — and sharing via email, Slack, Discord, or file hosting preserves everything.',
+        ],
+      },
+      {
+        heading: 'What platforms strip EXIF and which don\'t',
+        paragraphs: [
+          'Platforms that strip EXIF on upload: Instagram, Twitter/X, Facebook. These re-encode your photo for their own purposes (resizing, compression), which removes EXIF as a side effect.',
+          'Platforms that preserve EXIF: Email attachments, Slack, Discord (in most cases), Google Drive, Dropbox, iCloud sharing links, direct file transfers, personal websites, forums, and most cloud storage services. If you share photos through any of these channels, the EXIF data is included unless you remove it first.',
+        ],
+      },
+      {
+        heading: 'How to strip EXIF without uploading your photos',
+        paragraphs: [
+          'The irony of most online EXIF removers is that they require you to upload your photo to a server — exposing the very data you\'re trying to protect. Your GPS coordinates and device info travel to a third-party server before being stripped.',
+          'Browser-based metadata removal avoids this entirely. Acorn Tools strips EXIF data by re-encoding the image pixel data without the metadata tags. The processing happens in your browser — the photo with its embedded location data never leaves your device. You can batch-process multiple photos at once.',
+        ],
+      },
+      {
+        heading: 'What about PDF metadata?',
+        paragraphs: [
+          'PDFs have their own metadata problem. The document properties can contain the author\'s name, the software used to create it, creation and modification dates, and keywords. When you merge, edit, or convert PDFs, metadata accumulates from every tool in the chain.',
+          'Acorn Tools strips PDF metadata the same way — locally in your browser. Author, title, subject, keywords, creator, and date fields are all cleared. This is particularly important before sharing legal documents, contracts, or reports where the metadata could reveal information about your internal processes.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'png-vs-jpg-vs-webp-which-format',
+    title: 'PNG vs JPG vs WebP: Which Image Format Should You Use?',
+    metaTitle: 'PNG vs JPG vs WebP: Which Image Format Should You Use? — Acorn Tools',
+    description: 'A practical guide to choosing between PNG, JPG, and WebP for websites, social media, and everyday use. Understand the trade-offs between quality, file size, and compatibility.',
+    date: '2026-03-27',
+    readTime: '6 min read',
+    category: 'Technical Guide',
+    ctas: [
+      { label: 'Convert Format', path: '/convert-image', icon: '⇄' },
+      { label: 'Compress Images', path: '/compress-image', icon: '▼' },
+      { label: 'Resize Images', path: '/resize-image', icon: '⤡' },
+    ],
+    sections: [
+      {
+        heading: 'The short answer',
+        paragraphs: [
+          'Use JPEG for photographs and complex images with many colors. Use PNG for screenshots, logos, text-heavy images, and anything that needs transparency. Use WebP for web content where you want smaller files and your audience uses modern browsers.',
+          'That\'s the quick rule. The rest of this article explains why, and when the exceptions apply.',
+        ],
+      },
+      {
+        heading: 'JPEG: the universal photograph format',
+        paragraphs: [
+          'JPEG uses lossy compression — it discards visual information that humans are unlikely to notice, achieving dramatic file size reductions. A 10MB raw photo might compress to 500KB as a JPEG with no visible quality difference at normal viewing sizes.',
+          'JPEG excels at photographs, artwork, and images with smooth gradients and complex color variations. It struggles with sharp edges, text, and flat-color graphics — these develop visible artifacts (blocky patterns) at lower quality settings. JPEG does not support transparency.',
+          'Use JPEG when: sharing photos by email, uploading to social media, embedding images in documents, or any situation where universal compatibility matters. Every device, browser, and application supports JPEG.',
+        ],
+      },
+      {
+        heading: 'PNG: lossless quality and transparency',
+        paragraphs: [
+          'PNG uses lossless compression — no information is discarded. The decompressed image is identical to the original, pixel for pixel. This makes PNG ideal for images where precision matters: screenshots, text, logos, UI elements, diagrams, and graphics with flat colors and sharp edges.',
+          'PNG supports full alpha transparency, meaning pixels can be partially transparent. This is essential for logos and graphics that need to appear on different background colors. JPEG has no transparency support at all.',
+          'The trade-off is file size. PNG files are typically 5–10x larger than equivalent JPEGs for photographs. A photo saved as PNG might be 15MB; the same photo as JPEG might be 800KB. For photographs, this size penalty isn\'t worth it because the quality difference is imperceptible.',
+        ],
+      },
+      {
+        heading: 'WebP: the modern web standard',
+        paragraphs: [
+          'Developed by Google, WebP supports both lossy and lossless compression, plus transparency. At equivalent visual quality, WebP files are typically 25–35% smaller than JPEG and 25% smaller than PNG. This makes it the best choice for web performance.',
+          'The main limitation is compatibility. While all modern browsers support WebP (Chrome, Firefox, Safari, Edge), older software and some image editors don\'t. If you\'re sharing images via email or using them in desktop applications, JPEG or PNG is safer.',
+          'Use WebP when: building websites where page load speed matters, serving images through a CDN, or storing images where storage costs are a concern. Use JPEG or PNG as a fallback for email and offline use.',
+        ],
+      },
+      {
+        heading: 'AVIF: the next generation',
+        paragraphs: [
+          'AVIF (AV1 Image File Format) pushes compression further than WebP — typically 20% smaller at equivalent quality. It supports transparency, HDR, and wide color gamuts. Browser support is growing but not universal: Chrome and Firefox support it, Safari added support in version 16.4.',
+          'For most use cases today, WebP remains the practical choice for web delivery. AVIF is worth considering if you\'re building for cutting-edge browsers and want maximum compression.',
+        ],
+      },
+      {
+        heading: 'How to convert between formats',
+        paragraphs: [
+          'Acorn Tools converts between JPEG, PNG, WebP, and AVIF directly in your browser. Drop an image, select the target format, adjust quality settings if applicable, and download. You can batch-convert multiple images at once.',
+          'All conversion happens locally — your images are never uploaded to a server. This is particularly useful when converting screenshots or photos that contain sensitive content, since the files stay on your device throughout.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'merge-pdf-files-without-software',
+    title: 'How to Merge PDF Files Without Downloading Software',
+    metaTitle: 'How to Merge PDF Files Without Downloading Software — Acorn Tools',
+    description: 'Combine multiple PDFs into one document without installing software or uploading files. Browser-based merging that works on any device.',
+    date: '2026-03-27',
+    readTime: '4 min read',
+    category: 'How-To Guide',
+    ctas: [
+      { label: 'Merge PDFs', path: '/merge-pdf', icon: '⊕' },
+      { label: 'Compress PDF', path: '/compress-pdf', icon: '▼' },
+      { label: 'Organize Pages', path: '/pdf-pages', icon: '⊞' },
+    ],
+    sections: [
+      {
+        heading: 'The problem with PDF merging tools',
+        paragraphs: [
+          'You need to combine two PDFs — a cover letter and a resume, or several invoices into a monthly bundle. Adobe Acrobat can do it, but you don\'t have a subscription. Free desktop tools exist but require downloading and installing software, which may not be allowed on corporate machines.',
+          'So you search for "merge PDF online" and find dozens of web tools. They work, but they all upload your files to their servers. For personal documents, that might be acceptable. For client contracts, medical records, financial statements, or anything under NDA — it\'s a problem.',
+        ],
+      },
+      {
+        heading: 'Browser-based merging: no upload, no install',
+        paragraphs: [
+          'Modern browsers can run complex operations locally using WebAssembly and JavaScript libraries. Acorn Tools uses pdf-lib — a pure JavaScript PDF library — to merge PDFs entirely in your browser tab. Your files are read from your device, combined in browser memory, and the result is saved back to your device.',
+          'No server is involved. No installation is required. It works on any device with a modern browser — Windows, Mac, Linux, Chromebook, even tablets.',
+        ],
+      },
+      {
+        heading: 'Step by step: merge PDFs in your browser',
+        paragraphs: [
+          'Open the Merge PDFs tool. Drop your PDF files onto the page (or click to browse). The files appear in a list — drag to reorder them. Click merge and download the combined document.',
+          'Pages are copied directly from the source files. Text, images, fonts, formatting, hyperlinks, and bookmarks are preserved. There\'s no re-encoding, no quality loss, and no page limit. The only constraint is your device\'s available memory.',
+        ],
+      },
+      {
+        heading: 'When confidentiality matters',
+        paragraphs: [
+          'Merging is one of the most common operations in legal, healthcare, and financial document workflows. Assembling court filings, combining patient records for transfer, packaging due diligence documents — these all involve merging PDFs that contain confidential information.',
+          'Every file in a merge gets uploaded to the server when using online tools. That\'s not one document exposed — it\'s every document. Browser-based merging keeps all files on your device, which is the difference between compliance and exposure for organizations subject to HIPAA, GDPR, or confidentiality agreements.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'how-to-redact-pdf-free',
+    title: 'How to Redact a PDF for Free — True Redaction, Not Just Black Boxes',
+    metaTitle: 'How to Redact a PDF for Free — True Redaction | Acorn Tools',
+    description: 'Learn the difference between true PDF redaction and fake redaction (black boxes). Free browser-based tool that permanently destroys sensitive content.',
+    date: '2026-03-27',
+    readTime: '5 min read',
+    category: 'Privacy & Compliance',
+    ctas: [
+      { label: 'Redact PDF', path: '/redact-pdf', icon: '█' },
+      { label: 'Strip Metadata', path: '/strip-metadata', icon: '⊘' },
+      { label: 'Compress PDF', path: '/compress-pdf', icon: '▼' },
+    ],
+    sections: [
+      {
+        heading: 'Most PDF "redaction" tools don\'t actually redact',
+        paragraphs: [
+          'A surprising number of tools — including some expensive ones — "redact" PDFs by drawing a black rectangle over the text. The text is still in the file. Anyone can select it, copy it, or extract it with command-line tools. This isn\'t redaction; it\'s decoration.',
+          'Real-world consequences of fake redaction are well-documented. In 2014, a TSA security directive was "redacted" with black boxes that could be removed by copy-pasting into a text editor. In legal proceedings, improperly redacted documents have exposed privileged information, personal data, and classified details.',
+        ],
+      },
+      {
+        heading: 'What true redaction looks like',
+        paragraphs: [
+          'True redaction permanently destroys the content underneath the redaction mark. The original text or image no longer exists in the file in any form — not hidden, not covered, not accessible through any viewer or tool.',
+          'Acorn Tools achieves this by rasterizing each redacted page: the page is rendered as an image with the redaction rectangles burned in, then the rasterized version replaces the original page. The text underneath is not present in the output file. It cannot be recovered because it was never included.',
+          'Pages without redactions are copied verbatim — no quality loss, no rasterization. Only pages where you draw redaction rectangles are re-rendered.',
+        ],
+      },
+      {
+        heading: 'Why redaction must happen locally',
+        paragraphs: [
+          'Redaction is unique among document operations because the input (unredacted document) is more sensitive than the output (redacted document). When you upload a document to an online redaction tool, you\'re sending the unredacted version — the version with the sensitive content — to a third-party server.',
+          'This fundamentally defeats the purpose. The information you\'re trying to protect exists on someone else\'s infrastructure, even if only temporarily. For legal, medical, financial, or classified documents, this is unacceptable.',
+          'Browser-based redaction means the unredacted document never leaves your device. The sensitive content is destroyed locally, and only the redacted result is saved or shared. This is the only architecture that makes sense for true redaction.',
+        ],
+      },
+      {
+        heading: 'How to redact a PDF in your browser',
+        paragraphs: [
+          'Open the Redact PDF tool. Drop your PDF file. Pages are rendered as visual previews. Draw rectangles over any content you want to permanently remove — text, images, signatures, numbers, anything. The redaction rectangles appear in red so you can see exactly what will be removed.',
+          'Click redact and download the result. Redacted pages are rasterized with the content destroyed. Clean pages are preserved in their original quality. The whole process runs in your browser with no server involvement.',
+        ],
+      },
+      {
+        heading: 'Redaction for compliance',
+        paragraphs: [
+          'HIPAA requires redaction of protected health information (PHI) before sharing records with unauthorized parties. GDPR\'s "right to erasure" may require redacting personal data from archived documents. Legal discovery requires redacting privileged information before document production.',
+          'In all these cases, the tool you use matters as much as the redaction itself. Using a server-based tool to redact HIPAA-protected information means the unredacted PHI was transmitted to a third party — potentially a violation in itself. Browser-based redaction keeps PHI on the covered entity\'s device throughout.',
+        ],
+      },
+    ],
+  },
 ];
 
 // Build lookup map
