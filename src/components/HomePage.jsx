@@ -38,7 +38,7 @@ export default function HomePage() {
     <>
       <Helmet>
         <title>Acorn Tools — Free Private PDF & Image Tools</title>
-        <meta name="description" content="Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device. No sign-up required." />
+        <meta name="description" content="Free private PDF & image tools that run in your browser. Compress, convert, resize, crop, merge — nothing leaves your device. No sign-up, no upload, works offline." />
         <link rel="canonical" href={BASE_URL + '/'} />
         <meta property="og:title" content="Acorn Tools — Private PDF & Image Tools" />
         <meta property="og:description" content="Free private PDF & image tools. Compress, convert, resize, crop, merge — 100% offline, nothing leaves your device." />
@@ -72,11 +72,11 @@ export default function HomePage() {
         ])}</script>
       </Helmet>
 
-      {/* ── Stats bar ── */}
-      <StatsBar />
+      {/* ── Hero section ── */}
+      <HeroSection />
 
       {/* ── Tool grid ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, marginTop: 32 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, marginTop: 40 }}>
         {TOOLS.map((section) => (
           <div key={section.section}>
             <h2 style={{
@@ -101,6 +101,9 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* ── Why choose ── */}
+      <WhyChoose />
+
       {/* ── Privacy comparison ── */}
       <PrivacyComparison />
 
@@ -111,6 +114,143 @@ export default function HomePage() {
       <TechStack />
 
     </>
+  );
+}
+
+// ══════════════════════════════════════════
+// HeroSection — Headline + benefit pills
+// ══════════════════════════════════════════
+function HeroSection() {
+  const pills = [
+    '100% Free',
+    'No Upload Required',
+    'Open Source',
+    'Works Offline',
+  ];
+
+  return (
+    <div style={{ textAlign: 'center', marginBottom: 8 }}>
+      <h1 style={{
+        fontSize: 28, fontWeight: 800,
+        color: theme.text,
+        lineHeight: 1.25,
+        marginBottom: 12,
+        letterSpacing: '-0.01em',
+      }}>
+        Process PDFs & Images Securely in Your Browser
+      </h1>
+      <p style={{
+        fontSize: 15, color: theme.textMuted,
+        lineHeight: 1.6,
+        maxWidth: 540,
+        margin: '0 auto 20px',
+      }}>
+        Acorn Tools runs entirely in your browser using WebAssembly. Your files never leave your device — no uploads, no servers, no sign-ups.
+      </p>
+
+      <div style={{
+        display: 'flex', gap: 8,
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+      }}>
+        {pills.map((pill) => (
+          <span key={pill} style={{
+            fontSize: 11, fontWeight: 600,
+            padding: '5px 12px',
+            borderRadius: 20,
+            background: theme.accentDim,
+            color: theme.accent,
+            letterSpacing: '0.01em',
+          }}>
+            {pill}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════
+// WhyChoose — 6-card benefit grid
+// ══════════════════════════════════════════
+function WhyChoose() {
+  const benefits = [
+    {
+      title: '100% Private',
+      text: 'Your files never leave your device. All processing happens locally in your browser, ensuring complete privacy and security.',
+    },
+    {
+      title: 'No Upload Required',
+      text: 'Everything runs locally with zero network requests during processing. Verify it yourself — open the Network tab in DevTools.',
+    },
+    {
+      title: '15 Professional Tools',
+      text: 'Resize, compress, convert, crop, merge, split, redact, watermark, and more. A complete toolkit for images and PDFs.',
+    },
+    {
+      title: 'Lightning Fast',
+      text: 'WebAssembly-powered processing at near-native speed. No waiting for server roundtrips — results are instant.',
+    },
+    {
+      title: 'Works on Any Device',
+      text: 'Browser-based means it works on Windows, Mac, Linux, and Chromebook. No software to install, no IT approval needed.',
+    },
+    {
+      title: 'Open Source',
+      text: 'MIT-licensed and fully transparent. Inspect the code, verify privacy claims, self-host on your own infrastructure, or contribute.',
+    },
+  ];
+
+  return (
+    <div style={{ marginTop: 44 }}>
+      <h2 style={{
+        fontSize: 20, fontWeight: 700,
+        color: theme.text,
+        textAlign: 'center',
+        marginBottom: 6,
+      }}>
+        Why choose Acorn Tools?
+      </h2>
+      <p style={{
+        fontSize: 13, color: theme.textMuted,
+        textAlign: 'center',
+        lineHeight: 1.5,
+        marginBottom: 24,
+        maxWidth: 480,
+        margin: '0 auto 24px',
+      }}>
+        Built for people who care about where their files go.
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: 10,
+      }}>
+        {benefits.map((b) => (
+          <div key={b.title} style={{
+            padding: '20px 16px',
+            borderRadius: theme.radius,
+            border: `1px solid ${theme.border}`,
+            background: theme.surface,
+          }}>
+            <div style={{
+              fontSize: 14, fontWeight: 700,
+              color: theme.text,
+              marginBottom: 6,
+            }}>
+              {b.title}
+            </div>
+            <div style={{
+              fontSize: 12, color: theme.textMuted,
+              lineHeight: 1.55,
+            }}>
+              {b.text}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -388,58 +528,6 @@ function TrustSignals() {
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-// ══════════════════════════════════════════
-// StatsBar — Quick-scan credibility numbers
-// ══════════════════════════════════════════
-function StatsBar() {
-  const stats = [
-    { value: '15', label: 'Tools', sub: 'PDF & Image' },
-    { value: '0', label: 'Bytes uploaded', sub: 'Ever' },
-    { value: '100%', label: 'Open source', sub: 'MIT License' },
-    { value: '0', label: 'Sign-ups required', sub: 'No account needed' },
-  ];
-
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-      gap: 10,
-    }}>
-      {stats.map((s) => (
-        <div key={s.label} style={{
-          padding: '16px 14px',
-          borderRadius: theme.radius,
-          border: `1px solid ${theme.border}`,
-          background: theme.surface,
-          textAlign: 'center',
-        }}>
-          <div style={{
-            fontSize: 24, fontWeight: 700,
-            color: theme.accent,
-            fontFamily: theme.fontMono,
-            lineHeight: 1.2,
-          }}>
-            {s.value}
-          </div>
-          <div style={{
-            fontSize: 12, fontWeight: 600,
-            color: theme.text,
-            marginTop: 4,
-          }}>
-            {s.label}
-          </div>
-          <div style={{
-            fontSize: 10, color: theme.textDim,
-            marginTop: 2,
-          }}>
-            {s.sub}
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
