@@ -140,6 +140,7 @@ export default defineConfig({
           'pdf-engine': ['pdf-lib'],
           'resize-engine': ['pica'],
           'pdf-renderer': ['pdfjs-dist'],
+          'moveable': ['react-moveable'],
         },
       },
     },

@@ -433,6 +433,33 @@ const TOOL_CONTENT = {
     ],
   },
 
+  '/edit-pdf': {
+    relatedTools: ['/compress-pdf', '/merge-pdf', '/redact-pdf', '/watermark-pdf'],
+    sections: [
+      {
+        heading: 'How the browser-based PDF editor works',
+        paragraphs: [
+          'Acorn Tools renders your PDF pages using Mozilla\'s pdfjs-dist engine — the same renderer that powers Firefox\'s built-in PDF viewer. Each page is displayed as a high-resolution canvas. Overlay elements (text, images, shapes) are positioned on top of the canvas as interactive DOM elements.',
+          'When you export, pdf-lib maps each overlay\'s screen coordinates to PDF coordinates and burns the elements into the output document. The original page content is preserved exactly — your additions are layered on top.',
+        ],
+      },
+      {
+        heading: 'What you can add to a PDF',
+        paragraphs: [
+          'Add text annotations with custom font, size, and color. Place images (JPEG, PNG) anywhere on the page. Draw rectangles with custom border and fill colors for callouts or annotations. Use the highlight tool to mark important passages with semi-transparent yellow. Use white-out to cover existing content before adding new text over it.',
+          'All elements can be repositioned and resized after placement. Select an element to see its properties and adjust font, color, opacity, and dimensions.',
+        ],
+      },
+      {
+        heading: 'Why edit PDFs without uploading them',
+        paragraphs: [
+          'PDFs often contain contracts, medical records, financial statements, and other sensitive documents. Editing them through online tools means uploading the full document — including all its confidential content — to a third-party server.',
+          'Browser-based editing keeps your document entirely on your device. The PDF is rendered locally, edited locally, and exported locally. No server ever sees your content. This matters for HIPAA, GDPR, NDA compliance, and basic privacy.',
+        ],
+      },
+    ],
+  },
+
 };
 
 export { TOOL_CONTENT };

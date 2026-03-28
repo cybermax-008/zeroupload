@@ -257,6 +257,22 @@ const ROUTES = [
       { q: 'Can I insert pages from another PDF?', a: 'Yes. You can add pages from additional PDFs and arrange them alongside the original pages using drag-and-drop.' },
     ],
   },
+  {
+    path: '/edit-pdf',
+    toolId: 'pdfedit',
+    icon: '✎',
+    label: 'Edit PDF',
+    title: 'Edit PDF Online Without Uploading — Free | Acorn Tools',
+    description: 'Edit PDFs in your browser — add text, images, shapes, highlights, and white-out. No upload, no server. 100% private and free.',
+    h1: 'Edit PDF — Free, Private, No Upload',
+    seoContent: 'Add text, images, rectangles, highlights, and white-out to any PDF directly in your browser. All editing runs locally using WebAssembly — your document never leaves your device. No software to install, no sign-up required.',
+    faqs: [
+      { q: 'Can I add text to a PDF without Adobe Acrobat?', a: 'Yes. Acorn Tools lets you add text to any PDF directly in your browser. Click to place text, then type. You can change the font, size, and color. No Adobe subscription required.' },
+      { q: 'Is my PDF uploaded when I edit it?', a: 'No. All editing happens entirely in your browser. Your PDF is rendered locally and the modified version is exported locally. No file is ever sent to any server.' },
+      { q: 'Can I add images and shapes to a PDF?', a: 'Yes. You can add images (JPEG, PNG), rectangles with custom border and fill colors, highlights (semi-transparent yellow), and white-out regions to cover existing content.' },
+      { q: 'Does editing preserve the original PDF quality?', a: 'Yes. The editor overlays your additions onto the original pages. Existing content is preserved exactly as-is. Only the elements you add are burned into the exported PDF.' },
+    ],
+  },
 ];
 
 // Build lookup maps

@@ -28,6 +28,7 @@ const TOOLS = [
       { path: '/pdf-page-numbers',  icon: '#', label: 'Page Numbers',      desc: 'Add page numbers to PDF documents' },
       { path: '/redact-pdf',        icon: '█', label: 'Redact PDF',        desc: 'Permanently remove sensitive content' },
       { path: '/pdf-pages',         icon: '⊞', label: 'Organize Pages',    desc: 'Reorder, delete, and insert PDF pages' },
+      { path: '/edit-pdf',          icon: '✎', label: 'Edit PDF',          desc: 'Add text, images, shapes, and highlights' },
     ],
   },
 ];
@@ -59,7 +60,7 @@ export default function HomePage() {
             operatingSystem: 'Any (browser-based)',
             offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
             publisher: { '@type': 'Organization', name: 'Acorn Tools', url: BASE_URL },
-            featureList: 'Resize images, Compress images, Convert image formats, Crop images, Strip metadata, Image to PDF, PDF to image, Compress PDF, Merge PDFs, Split PDF, Rotate PDF, Watermark PDF, Page numbers, Redact PDF, Organize PDF pages',
+            featureList: 'Resize images, Compress images, Convert image formats, Crop images, Strip metadata, Image to PDF, PDF to image, Compress PDF, Merge PDFs, Split PDF, Rotate PDF, Watermark PDF, Page numbers, Redact PDF, Organize PDF pages, Edit PDF',
           },
           {
             '@context': 'https://schema.org',
@@ -184,8 +185,8 @@ function WhyChoose() {
       text: 'Everything runs locally with zero network requests during processing. Verify it yourself — open the Network tab in DevTools.',
     },
     {
-      title: '15 Professional Tools',
-      text: 'Resize, compress, convert, crop, merge, split, redact, watermark, and more. A complete toolkit for images and PDFs.',
+      title: '16 Professional Tools',
+      text: 'Resize, compress, convert, crop, merge, split, redact, edit, watermark, and more. A complete toolkit for images and PDFs.',
     },
     {
       title: 'Lightning Fast',
