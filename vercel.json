@@ -5,7 +5,7 @@
   ],
   "headers": [
     {
-      "source": "/:path(resize-image|compress-image|convert-image|crop-image|strip-metadata|image-to-pdf|pdf-to-image|compress-pdf|pdf-toolkit|merge-pdf|split-pdf|rotate-pdf|watermark-pdf|pdf-page-numbers|redact-pdf|pdf-pages|edit-pdf)",
+      "source": "/(.*)",
       "headers": [
         { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
