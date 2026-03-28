@@ -202,7 +202,7 @@ export default function PdfEditorTab() {
       <DropZone
         accept=".pdf"
         label="Drop a PDF file here to start editing"
-        onFile={handleFile}
+        onFiles={(files) => handleFile(files[0])}
       />
     );
   }
