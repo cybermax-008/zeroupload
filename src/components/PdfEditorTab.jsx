@@ -14,10 +14,17 @@ const TOOLS = [
 ];
 
 const FONTS = ['Helvetica', 'Courier', 'TimesRoman'];
-const RENDER_SCALE = 1.5;
 
 let nextId = 1;
 function genId() { return `el_${nextId++}`; }
+
+// Pick a render scale that won't blow up mobile memory
+function getRenderScale() {
+  const w = window.innerWidth || 800;
+  if (w < 600) return 1;
+  if (w < 1024) return 1.25;
+  return 1.5;
+}
 
 export default function PdfEditorTab() {
   const [pdfState, setPdfState] = useState(null);  // { doc, bytes, totalPages }
@@ -27,14 +34,15 @@ export default function PdfEditorTab() {
   const [zoom, setZoom] = useState(1);
   const [status, setStatus] = useState('');
   const [viewports, setViewports] = useState({});
-  const [renderedPages, setRenderedPages] = useState(new Set());
   const [fileName, setFileName] = useState('');
+  const [rendering, setRendering] = useState(false);
 
   const pagesContainerRef = useRef(null);
   const canvasRefs = useRef({});
   const targetRef = useRef(null);
   const imageInputRef = useRef(null);
   const pendingImagePage = useRef(null);
+  const renderScaleRef = useRef(getRenderScale());
 
   // ── Load PDF ──
   const handleFile = useCallback(async (file) => {
@@ -46,40 +54,75 @@ export default function PdfEditorTab() {
       setPdfState(result);
       setElements({});
       setSelectedId(null);
-      setRenderedPages(new Set());
       setViewports({});
+      setRendering(true);
       setStatus('');
     } catch (e) {
       setStatus('Failed to load PDF: ' + e.message);
     }
   }, []);
 
-  // ── Render pages ──
+  // ── Render pages — waits for canvases to mount ──
   useEffect(() => {
-    if (!pdfState) return;
-    const renderAll = async () => {
+    if (!pdfState || !rendering) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 20; // 20 x 100ms = 2s max wait
+
+    const tryRender = async () => {
+      // Wait for at least the first canvas to mount
+      const firstCanvas = canvasRefs.current[1];
+      if (!firstCanvas && attempts < maxAttempts) {
+        attempts++;
+        setTimeout(tryRender, 100);
+        return;
+      }
+
+      if (cancelled) return;
+
       const newViewports = {};
-      const newRendered = new Set();
+      const scale = renderScaleRef.current;
+
       for (let p = 1; p <= pdfState.totalPages; p++) {
         const canvas = canvasRefs.current[p];
         if (!canvas) continue;
-        const vp = await renderPageToCanvas(pdfState.doc, p, RENDER_SCALE, canvas);
-        newViewports[p] = { width: vp.width, height: vp.height, scale: RENDER_SCALE };
-        newRendered.add(p);
+        try {
+          const vp = await renderPageToCanvas(pdfState.doc, p, scale, canvas);
+          newViewports[p] = { width: vp.width, height: vp.height, scale };
+        } catch (err) {
+          console.error(`[PdfEditor] Failed to render page ${p}:`, err);
+          setStatus(`Failed to render page ${p}`);
+        }
       }
-      setViewports(newViewports);
-      setRenderedPages(newRendered);
+
+      if (!cancelled) {
+        setViewports(newViewports);
+        setRendering(false);
+        if (Object.keys(newViewports).length === 0) {
+          setStatus('Failed to render PDF pages. Try a different file.');
+        }
+      }
     };
-    // Small delay to let canvases mount
-    const t = setTimeout(renderAll, 50);
-    return () => clearTimeout(t);
-  }, [pdfState]);
+
+    tryRender();
+    return () => { cancelled = true; };
+  }, [pdfState, rendering]);
+
+  // ── Auto-fit zoom for mobile ──
+  useEffect(() => {
+    if (!pdfState) return;
+    const containerWidth = pagesContainerRef.current?.clientWidth;
+    const vp1 = viewports[1];
+    if (containerWidth && vp1 && vp1.width > containerWidth - 40) {
+      setZoom(Math.max(0.3, (containerWidth - 40) / vp1.width));
+    }
+  }, [viewports, pdfState]);
 
   // ── Keyboard: Delete selected element ──
   useEffect(() => {
     const handler = (e) => {
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
-        // Don't delete if editing text
         const active = document.activeElement;
         if (active?.contentEditable === 'true' || active?.tagName === 'INPUT') return;
         e.preventDefault();
@@ -92,15 +135,16 @@ export default function PdfEditorTab() {
 
   // ── Element CRUD ──
   const addElement = useCallback((type, pageNum, x, y, extra = {}) => {
+    const z = zoom || 1;
     const defaults = {
-      text: { width: 160, height: 28, text: 'Text', fontSize: 14, fontFamily: 'Helvetica', color: '#000000', opacity: 1 },
-      rectangle: { width: 120, height: 80, fill: 'transparent', borderColor: '#ff0000', borderWidth: 2, opacity: 1 },
-      highlight: { width: 120, height: 24, opacity: 0.35 },
-      whiteout: { width: 120, height: 24, opacity: 1 },
-      image: { width: 150, height: 150, imageData: null, opacity: 1 },
+      text: { width: 160 / z, height: 28 / z, text: 'Text', fontSize: 14, fontFamily: 'Helvetica', color: '#000000', opacity: 1 },
+      rectangle: { width: 120 / z, height: 80 / z, fill: 'transparent', borderColor: '#ff0000', borderWidth: 2, opacity: 1 },
+      highlight: { width: 120 / z, height: 24 / z, opacity: 0.35 },
+      whiteout: { width: 120 / z, height: 24 / z, opacity: 1 },
+      image: { width: 150 / z, height: 150 / z, imageData: null, opacity: 1 },
     };
     const id = genId();
-    const el = { id, type, pageNum, x, y, ...defaults[type], ...extra };
+    const el = { id, type, pageNum, x: x / z, y: y / z, ...defaults[type], ...extra };
     setElements(prev => ({
       ...prev,
       [pageNum]: [...(prev[pageNum] || []), el],
@@ -108,7 +152,7 @@ export default function PdfEditorTab() {
     setSelectedId(id);
     setActiveTool('select');
     return id;
-  }, []);
+  }, [zoom]);
 
   const updateElement = useCallback((id, updates) => {
     setElements(prev => {
@@ -147,14 +191,14 @@ export default function PdfEditorTab() {
   // ── Page click handler — add elements ──
   const handlePageClick = useCallback((e, pageNum) => {
     if (activeTool === 'select') {
-      // Click on empty area = deselect
       if (e.target.tagName === 'CANVAS' || e.target.dataset.overlay) {
         setSelectedId(null);
       }
       return;
     }
     if (activeTool === 'image') {
-      pendingImagePage.current = { pageNum, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+      const rect = e.currentTarget.getBoundingClientRect();
+      pendingImagePage.current = { pageNum, x: e.clientX - rect.left, y: e.clientY - rect.top };
       imageInputRef.current?.click();
       return;
     }
@@ -193,10 +237,9 @@ export default function PdfEditorTab() {
     }
   }, [pdfState, elements, viewports, fileName]);
 
-  // ── Selected element ref binding ──
   const selectedEl = getSelectedElement();
 
-  // ── Render ──
+  // ── No PDF loaded ──
   if (!pdfState) {
     return (
       <DropZone
@@ -221,19 +264,19 @@ export default function PdfEditorTab() {
             title={t.label}
             style={{
               fontFamily: theme.font,
-              fontSize: 13, fontWeight: 600,
-              padding: '6px 12px',
+              fontSize: 12, fontWeight: 600,
+              padding: '6px 10px',
               borderRadius: 6,
               border: `1px solid ${activeTool === t.id ? theme.accent : theme.border}`,
               background: activeTool === t.id ? theme.accentDim : 'transparent',
               color: activeTool === t.id ? theme.accent : theme.textMuted,
               cursor: 'pointer',
               transition: theme.transition,
-              display: 'flex', alignItems: 'center', gap: 5,
+              display: 'flex', alignItems: 'center', gap: 4,
             }}
           >
-            <span style={{ fontSize: 14 }}>{t.icon}</span>
-            {t.label}
+            <span style={{ fontSize: 13 }}>{t.icon}</span>
+            <span className="tool-label" style={{ fontSize: 11 }}>{t.label}</span>
           </button>
         ))}
 
@@ -241,26 +284,28 @@ export default function PdfEditorTab() {
 
         {/* Zoom */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button onClick={() => setZoom(z => Math.max(0.5, z - 0.25))} style={zoomBtnStyle}>-</button>
+          <button onClick={() => setZoom(z => Math.max(0.25, z - 0.25))} style={zoomBtnStyle}>-</button>
           <span style={{ fontSize: 11, color: theme.textMuted, fontFamily: theme.fontMono, width: 40, textAlign: 'center' }}>
             {Math.round(zoom * 100)}%
           </span>
           <button onClick={() => setZoom(z => Math.min(3, z + 0.25))} style={zoomBtnStyle}>+</button>
         </div>
 
-        <Btn onClick={handleExport} accent style={{ marginLeft: 8 }}>
-          Export PDF
+        <Btn onClick={handleExport} accent style={{ marginLeft: 4 }}>
+          Export
         </Btn>
       </div>
 
-      {/* ── Properties panel (context-sensitive) ── */}
+      {/* ── Properties panel ── */}
       {selectedEl && (
         <PropertiesPanel element={selectedEl} onChange={updateElement} onDelete={() => deleteElement(selectedEl.id)} />
       )}
 
       {/* ── Status ── */}
-      {status && (
-        <div style={{ fontSize: 12, color: theme.accent, padding: '4px 0' }}>{status}</div>
+      {(status || rendering) && (
+        <div style={{ fontSize: 12, color: theme.accent, padding: '4px 0' }}>
+          {rendering ? 'Rendering pages…' : status}
+        </div>
       )}
 
       {/* ── Pages ── */}
@@ -268,19 +313,21 @@ export default function PdfEditorTab() {
         ref={pagesContainerRef}
         style={{
           overflow: 'auto',
+          WebkitOverflowScrolling: 'touch',
           maxHeight: '70vh',
           background: theme.bg,
           borderRadius: theme.radius,
           border: `1px solid ${theme.border}`,
-          padding: 20,
+          padding: 16,
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
         }}
       >
         {Array.from({ length: pdfState.totalPages }, (_, i) => i + 1).map(pageNum => {
           const vp = viewports[pageNum];
+          const pageW = vp ? vp.width * zoom : 300;
+          const pageH = vp ? vp.height * zoom : 400;
           return (
-            <div key={pageNum} style={{ position: 'relative' }}>
-              {/* Page label */}
+            <div key={pageNum} style={{ position: 'relative', maxWidth: '100%' }}>
               <div style={{
                 fontSize: 10, color: theme.textDim, marginBottom: 4,
                 textAlign: 'center', fontFamily: theme.fontMono,
@@ -288,26 +335,27 @@ export default function PdfEditorTab() {
                 Page {pageNum} of {pdfState.totalPages}
               </div>
 
-              {/* Page container */}
               <div
                 style={{
                   position: 'relative',
-                  width: vp ? vp.width * zoom : 'auto',
-                  height: vp ? vp.height * zoom : 'auto',
+                  width: pageW,
+                  height: pageH,
+                  maxWidth: '100%',
                   cursor: activeTool !== 'select' ? 'crosshair' : 'default',
                   boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
                   borderRadius: 2,
                   overflow: 'hidden',
+                  background: '#fff',
                 }}
                 onClick={(e) => handlePageClick(e, pageNum)}
               >
-                {/* PDF canvas */}
                 <canvas
                   ref={el => { canvasRefs.current[pageNum] = el; }}
                   style={{
                     display: 'block',
-                    width: vp ? vp.width * zoom : '100%',
-                    height: vp ? vp.height * zoom : 'auto',
+                    width: pageW,
+                    height: pageH,
+                    maxWidth: '100%',
                   }}
                 />
 
@@ -335,7 +383,6 @@ export default function PdfEditorTab() {
                 {/* Moveable for selected element */}
                 {selectedId && selectedEl?.pageNum === pageNum && (
                   <MoveableWrapper
-                    targetRef={targetRef}
                     element={selectedEl}
                     zoom={zoom}
                     onChange={(updates) => updateElement(selectedId, updates)}
@@ -360,19 +407,10 @@ export default function PdfEditorTab() {
 }
 
 // ══════════════════════════════════════════
-// ElementOverlay — Renders a single overlay element
+// ElementOverlay
 // ══════════════════════════════════════════
 function ElementOverlay({ element: el, zoom, isSelected, onSelect, onChange }) {
   const ref = useRef(null);
-
-  // Expose ref to parent for Moveable targeting
-  useEffect(() => {
-    if (isSelected && ref.current) {
-      // Find the MoveableWrapper's targetRef
-      const event = new CustomEvent('editor-element-ref', { detail: { id: el.id, el: ref.current } });
-      window.dispatchEvent(event);
-    }
-  }, [isSelected, el.id]);
 
   const baseStyle = {
     position: 'absolute',
@@ -500,18 +538,19 @@ function ElementOverlay({ element: el, zoom, isSelected, onSelect, onChange }) {
 }
 
 // ══════════════════════════════════════════
-// MoveableWrapper — Drag/resize selected element
+// MoveableWrapper
 // ══════════════════════════════════════════
-function MoveableWrapper({ targetRef, element, zoom, onChange }) {
+function MoveableWrapper({ element, zoom, onChange }) {
   const [target, setTarget] = useState(null);
 
   useEffect(() => {
-    const el = document.querySelector(`[data-element-id="${element.id}"]`);
-    if (el) {
-      setTarget(el);
-      targetRef.current = el;
-    }
-  }, [element.id, targetRef]);
+    // Small delay to ensure DOM is ready after React render
+    const t = setTimeout(() => {
+      const el = document.querySelector(`[data-element-id="${element.id}"]`);
+      if (el) setTarget(el);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [element.id]);
 
   if (!target) return null;
 
@@ -557,7 +596,7 @@ function MoveableWrapper({ targetRef, element, zoom, onChange }) {
 }
 
 // ══════════════════════════════════════════
-// PropertiesPanel — Context-sensitive element properties
+// PropertiesPanel
 // ══════════════════════════════════════════
 function PropertiesPanel({ element: el, onChange, onDelete }) {
   const update = (key, value) => onChange(el.id, { [key]: value });
@@ -576,7 +615,6 @@ function PropertiesPanel({ element: el, onChange, onDelete }) {
         {el.type}
       </span>
 
-      {/* Text properties */}
       {el.type === 'text' && (
         <>
           <label style={propLabelStyle}>
@@ -611,7 +649,6 @@ function PropertiesPanel({ element: el, onChange, onDelete }) {
         </>
       )}
 
-      {/* Rectangle properties */}
       {el.type === 'rectangle' && (
         <>
           <label style={propLabelStyle}>
@@ -645,7 +682,6 @@ function PropertiesPanel({ element: el, onChange, onDelete }) {
         </>
       )}
 
-      {/* Opacity for all types */}
       {(el.type === 'text' || el.type === 'rectangle' || el.type === 'image') && (
         <label style={propLabelStyle}>
           Opacity
