@@ -37,6 +37,7 @@ Engine state is stored as **module-level variables** (not React state) — a sin
 - `src/lib/metadataEngine.js` — EXIF/metadata stripping for images (canvas re-encode) and PDFs (pdf-lib field clearing). Includes a lightweight JPEG EXIF parser for display.
 - `src/lib/pdfPageEngine.js` — Page-level PDF operations (reorder, delete, insert, thumbnails) using pdf-lib + pdfjs-dist.
 - `src/lib/pdfRedactEngine.js` — True PDF redaction: rasterizes pages with redaction rectangles burned in (destroying original content). Clean pages copied verbatim. Uses normalized coordinates (0-1). **Important:** pdfjs-dist transfers ArrayBuffers to its worker — always use `bytes.slice(0)` when sharing a buffer between pdfjs and pdf-lib.
+- `src/lib/pdfEditEngine.js` — PDF editor engine: loads PDFs with pdfjs-dist, renders pages to canvas, exports modified PDFs with pdf-lib by burning DOM overlay elements (text, images, shapes) into the output. Coordinate mapping from screen space (top-left origin) to PDF space (bottom-left origin). Uses `react-moveable` (code-split into its own chunk) for drag/resize of overlay elements.
 
 **Note:** pdf-lib does NOT support PDF encryption. Do not attempt `save({ userPassword })` — it silently produces an unencrypted file.
 
@@ -72,7 +73,7 @@ All tools are completely free with no usage limits. The former monetization syst
 
 ### SEO & Structured Data
 
-All pages include JSON-LD structured data via `react-helmet-async`. Tool pages have `SoftwareApplication` + `FAQPage` + `BreadcrumbList` schemas. Blog articles have `Article` + `BreadcrumbList`. Homepage has `WebApplication` + `Organization`. Tool pages render collapsible FAQ sections from `faqs` arrays in `routes.js`.
+All pages include JSON-LD structured data via `react-helmet-async`. Tool pages have `SoftwareApplication` + `FAQPage` + `BreadcrumbList` schemas. Blog articles have `Article` + `BreadcrumbList`. Homepage has `WebApplication` + `Organization`. Tool pages render collapsible FAQ sections from `faqs` arrays in `routes.js`. `src/lib/toolContent.js` provides rich below-the-fold content sections and related tool links for each tool page, rendered by `ToolPage.jsx`.
 
 ### Component Structure
 
@@ -89,4 +90,4 @@ Cross-Origin-Embedder-Policy: require-corp
 Cross-Origin-Opener-Policy: same-origin
 ```
 
-These are configured in `vercel.json` for production and `vite.config.js` for dev/preview servers.
+These are configured globally for all routes in `vercel.json` for production and `vite.config.js` for dev/preview servers. They must be on all routes (not just tool routes) because the image engine initializes on App mount — if the entry page lacks headers, Pica gets cached for the entire SPA session.
